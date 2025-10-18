@@ -723,8 +723,9 @@ the backout queue for that queue using MQ Explorer.
 
 # MQOutputNode mode. How your messages will be processed
 
-https://www.youtube.com/watch?v=DiTdocdPc9w If the Transaction mode is
-Automatic then it will inherit from the MQInput node.
+[Transaction Mode of MQ Output](https://www.youtube.com/watch?v=DiTdocdPc9w)
+
+If the Transaction mode is Automatic then it will inherit from the MQInput node.
 
 If the Transaction mode is Yes then it will wait for the whole flow
 (Transaction) to complete before the MQPUT results in a message existing
@@ -737,18 +738,30 @@ the output queue
 # Scenario full queue MQOutputNode node
 
 Look for "Resolving implementation problems when developing message
-flows" in IBM's online ACE page. Then look for "Messages enter the
-message flow but do not exit". 21DEC2020-IIB FixHTTPProdCon_ESQLThrow
-36 minutes shows you how the flow looks. The MQPUT command to the output
-queue that is defined on the MQOutput node is not successful because the
-queue is FULL. The Failure terminal of the MQInput node has not been
-connected. Non-transactional messages are discarded. Whenever
-Transaction mode of the MQInput node is automatic, then transactionality
-is defined by persistence of the queue for the node. When queues are
-defined the Default persistence is 'Not Persistent'. So the behaviour
-is the same as when Transaction mode is 'No'. This means that, when
-the exception is not handled, the non-transactional messages are
-discarded.
+flows" in IBM's online ACE page. Then look for [Messages enter the
+message flow but do not exit](https://www.ibm.com/docs/en/app-connect/13.0.x?topic=flows-resolving-implementation-problems-when-developing-message#au16530_2)
+
+[DEC212020-IIB FixHTTPProdCon_ESQLThrow](https://drive.google.com/file/d/1-KG_swTi1BJSf9WFXBYR-PDvSR_UOSoV/view?usp=share_link)
+33:52 minutes shows you how the flow looks.
+
+> **_FUNDAMENTAL:_**  In a flow even if you have 30 nodes in a message flow, if any of the nodes throws an error, the transaction is rolled back to node 1 in your message flow.
+
+When a rollback occurs the exception is in the ExceptionList tree at the end. If the first node's catch terminal is connected then the Message and ExceptionList trees are sent to the node connected to catch. That node could be a transaction node that reads the exception and maybe an MQOutput node that puts the message on a queue. That way the message is not lost.
+
+If catch is not connected then it will try the Failure node. It will send the Message tree but not the ExceptionList. Instead of the ExceptionList it will send the default exception which will say "you did not handle the Catch terminal".
+
+Another scenario is when the MQPUT command to the output queue that is defined on the MQOutput node may not successful because the queue is FULL. The Failure terminal of the MQInput node has not been
+connected. Non-transactional messages are discarded. Whenever Transaction mode of the MQInput node is automatic, then transactionality is defined by persistence of the queue for the node. When queues are defined the Default persistence is 'Not Persistent'. 
+
+So the behaviour is the same as when Transaction mode is 'No'. This means that, when the exception is not handled, the non-transactional messages are discarded.
+
+When Transaction mode is Automatic and Default Persistance property on the IN queue is Persistent then (if DLQ on queue manager is defined) then the message persists to the DLQ.
+
+Sometimes the app sending the message to the flow has a Persistent Msg setting:
+
+![MQMD tab in rfhutilc](IIB.fld/rfhutilMQMDsection.png)
+
+If you select No then it will override the queues "Persistent" setting and the message is lost.
 
 When the transaction mode setting for MQInput node is Yes, MQOutput
 node is Automatic (transactionality derived from the Input node), Input
@@ -759,41 +772,35 @@ If I change the persistence to Persistent for the OUT queue, it makes no
 difference so I reverted. If I change the persistence to Persistent for
 the IN queue then I see in the syslog:
 
-[]"BIP2643W: Unable to commit a WebSphere MQ transaction; MQCMIT
+```
+"BIP2643W: Unable to commit a WebSphere MQ transaction; MQCMIT
 failed; queue manager=QM3, MQCC=1, MQRC=2003."
 
 "BIP2648E: Message backed out to a queue; message flow node
 'EsqlThrowStmt.MQ Input'."
+```
 
 The message has been backed out to the DLQ for the QMGR.
 
 # MQ Output
 
-29DEC2020-IIB Timeout_LabelRouting_MultiQueues. You can send the
-message to multiple queues in ESQL. You need to change the Compute mode
+[DEC292020-IIB Timeout_LabelRouting_MultiQueues](https://drive.google.com/file/d/1sJ3i-KQYDRGw1UG38bU05uUMFCe6r-Pa/view?usp=share_link)
+
+You can send the message to multiple queues in ESQL. You need to change the Compute mode
 to LocalEnvironment and Message in the Compute node properties as well
 as the MQ Output's Destination mode to Destination List. Use the
 command:
 
-SET
-OutputLocalEnvironment.Destination.MQ.DestinationData[1].queueName='OUT';
-
-SET
-OutputLocalEnvironment.Destination.MQ.DestinationData[2].queueName='OUT1';
-
-
-
-
+```
+SET OutputLocalEnvironment.Destination.MQ.DestinationData[1].queueName='OUT';
+SET OutputLocalEnvironment.Destination.MQ.DestinationData[2].queueName='OUT1';
+```
 
 # MQ Reply
 
-04JAN2021-IIBFileNodeBARMQReplyTryCatchFlowOrder 24 minutes. The client
+[JAN042021-IIBFileNodeBARMQReplyTryCatchFlowOrder](https://drive.google.com/file/d/15EypxxgHztb_VdEnJa82vgmFoQO7wY7L/view?usp=share_link) 24 minutes. The client
 system sets the name of the queue the flow has to reply to. RFHUTIL
 allows you to set the ReplyTo header setting.
-
-
-
-
 
 # IIB Node Connecting to Database using ODBC pt1
 
@@ -801,31 +808,33 @@ Use the command console to associate a DSN with a broker instance. You
 create an ODBC connection to the data source DBNAME with the
 command:
 
-[mqsisetdbparms IB9BROKER -n DBNAME -u -p]
+```
+mqsisetdbparms IB9BROKER -n DBNAME -u -p
+```
 
-You now need to reload the configuration since the new association of
-DBNAME to IB9BROKER:
+You now need to reload the configuration since the new association of DBNAME to IB9BROKER:
 
-[mqsireload IB9BROKER]
+```
+mqsireload IB9BROKER
+```
 
-[Then check the connection using "mqsicvp IB9BROKER -n DBNAME"]
-
-
+Then check the connection using 
+```
+mqsicvp IB9BROKER -n DBNAME
+```
 
 # IIB Node Connecting to Database using ODBC pt2
 
-[IIBGURU entered:]
+IIBGURU entered:
+
+```
+$ db2start
 
 
-
-[$ db2start]
-
-[$ db2]
-
-[db2 => connect to sample]
-
-[db2 => SELECT * FROM EMPLOYEE]
-
+$ db2
+db2 => connect to sample
+db2 => SELECT * FROM EMPLOYEE
+```
 
 
 Create a new Application name DBINTER_APP. Then right click on
@@ -835,78 +844,55 @@ MQInput out connects to the in of the Compute node. Compute out connects
 to the in of the MQOutput node. MQInput node will use the XMLNSC parser
 to read XML records
 
-[ ]
+```
+        9001
+        TRUMP
+        New York
+```
 
-
-
-[        9001]
-
-[        TRUMP]
-
-[        New York]
-
-
-
-[    ]
-
-\
 ...that will be INSERTED into DBNAME. The Compute node has Data Source
 DBNAME. Double click on the node to bring up the ESQL
 editor.
 
-\
 Uncomment --- CALL CopyMessageHeaders(); so that we can send a success
-message to the out queue.\
-Compare
+message to the out queue.
+Compare this SQL
 
-[ ]
+```
+INSERT INTO EMPLOYEE VALUES(101,'IIBGURU','CALIFORNIA')
+```
 
-[        INSERT INTO EMPLOYEE VALUES(101,'IIBGURU','CALIFORNIA')]
-
-
-
-\
 With what we use in ESQL Compute Node.
 
-[ ]
-
+```
 INSERT INTO Database.iibguru.EMPLOYEE
-VALUES(InputRoot.XMLNSC.EMPLOYEE.ENO, InputRoot.XMLNSC.EMPLOYEE.ENAME,
-InputRoot.XMLNSC.EMPLOYEE.ECITY);
+VALUES(InputRoot.XMLNSC.EMPLOYEE.ENO, InputRoot.XMLNSC.EMPLOYEE.ENAME, InputRoot.XMLNSC.EMPLOYEE.ECITY);
+```
 
---- You can use CTRL space to have content assist help with the
-syntax
+> **Note** You can use CTRL space to have content assist help with the syntax
 
-[The above could be written as:]
+The above could be written as:
 
-[ ]
-
-[        DECLARE InRef REFERENCE TO InputRoot.XMLNSC.EMPLOYEE;]
-
-
-
-INSERT INTO Database.iibguru.EMPLOYEE VALUES(InRef.ENO,
-InRef.ENAME, InRef.ECITY);
-
-
+```
+  DECLARE InRef REFERENCE TO InputRoot.XMLNSC.EMPLOYEE;
+  INSERT INTO Database.iibguru.EMPLOYEE VALUES(InRef.ENO, InRef.ENAME, InRef.ECITY);
+```
 
 We are getting the values from the Input message tree where the domain
 is XMLNSC, EMPLOYEE is the root child. "Database" is a keyword & the
 iibguru is the schema in which EMPLOYEE table exists. Here the schema is
 the user name. It will use the user name as the schema if you have not
-created the schema before creating a table in the database.\
-\
-\
-\
+created the schema before creating a table in the database.
+
 When you save the ESQL in the Compute node you get a warning
 "Unresolvable database table reference 'Database.iibguru.EMPLOYEE'".
 This is because it only resolves and finds EMPLOYEE during execution.
 The successive command after the INSERT will only run if the INSERT
 executes correctly. It is:
 
-[ ]
-
-[        SET OutputRoot.XMLNSC.DBINSERT.STATUS='SUCCESS';]
+```
+  SET OutputRoot.XMLNSC.DBINSERT.STATUS='SUCCESS';
+```
 
 
 
@@ -926,22 +912,17 @@ has
 
 
 
-[        XMLNSC    |]
-
-[                |]
-
-[                V]
-
-[                EMPLOYEE|]
-
-[                          |]
-
-[                         V]
-
-ENO (9001), ENAME (TRUMP), ECITY(New
-York)
-
-
+```
+  XMLNSC
+  |
+  |
+  V
+  EMPLOYEE
+    |
+    |
+    V
+    ENO (9001), ENAME (TRUMP), ECITY(New York)
+```
 
 We can go inside the scope of the Compute node by clicking on the
 thread in the Debug perspective, then click on Step into code icon which
@@ -952,18 +933,14 @@ headers to the output. EVEN though the INSERT has been executed the
 change has not been committed to the database. This is because
 the
 
-
-
-[INSERT INTO....]
-
+```
+INSERT INTO....
 SET OutputRoot...
-
-[RETURN TRUE;]
-
-
+RETURN TRUE;
+```
 
 Are considered as 1 unit of work. Only until every command in the ESQL
-happens without error & the [whole flow]{.s5} completes will the
+happens without error & the ___whole flow___ completes will the
 INSERT be committed. Else a rollback will occur. This is controlled by
 the Transaction property of the Compute node. The possible values are
 Automatic (default) or Commit. The latter will commit the INSERT once
@@ -972,39 +949,31 @@ flow to complete.
 
 
 
-# PATH AREA.CIRCLE #\*\* this allows you to reference ESQL in another
-
-broker schema
+***PATH AREA.CIRCLE*** this allows you to reference ESQL in another broker schema
 
 
 
 # Oracle DB ESQL
 
-\
 DSN TEST_DSN, Schema is SYSTEM
 
-[DECLARE EMP ROW;]
+```
+DECLARE EMP ROW;
 
-[        --- ROW is a datatype that holds a tree structure]
+--- ROW is a datatype that holds a tree structure]
 
-SET EMP.Result[] = SELECT * FROM Database.SYSTEM.EMP_DETAILS
-AS R WHERE R.EMPID=InRef.id;
+SET EMP.Result[] = SELECT * FROM Database.SYSTEM.EMP_DETAILS AS R WHERE R.EMPID=InRef.id;
+```
 
 
-
-We then send this XML:\
-{.s4}SET OutputRoot.JSON.Data.Employee.ID = EMP.Result.EMPID; //only
-works with a single value not multiple
-
-[ ]
+We then send this XML:
+```
+SET OutputRoot.JSON.Data.Employee.ID = EMP.Result.EMPID; //only works with a single value not multiple
+```
 
 # PASSTHRU with EVAL
 
-
-
-[https://youtu.be/0CX9--Y2jOk?si=0Mx5cJC8IDdW2GL1]
-
-
+[EVAL function in ESQL](https://youtu.be/0CX9--Y2jOk?si=0Mx5cJC8IDdW2GL1)
 
 Example of PASSTHRU where there are 2 procedures with the same name but
 in ESQL files contained in different schemas. How can we invoke them
@@ -1012,87 +981,58 @@ dynamically at runtime? We can use EVAL to run the procedure that is
 connected to a key value in some incoming XML or JSON. For example if
 the value is Professional then invoke the EmpDetails procedure in the
 Pro schema. If it is Personal invoke the EmpDetails in the Personal
-schema. https://youtu.be/0CX9--Y2jOk:
+schema:
 
-[ ]
+```
+SET Emp.EmpRecord[] = PASSTHRU('SELECT * FROM EMPLOYEE WHERE EMPNO='||''''||EmpID||'''');
+SET Emp.EmpRecord[] = PASSTHRU('SELECT * FROM EMPLOYEE WHEREEMPNO='||''''||EmpID||'''');
 
-SET Emp.EmpRecord[] = PASSTHRU('SELECT * FROM EMPLOYEE WHERE
-EMPNO='{.s6}[||''''||EmpID||'''');]
+DECLARE DbRecords REFERENCE TO Emp.EmpRecord;
 
-SET Emp.EmpRecord[] = PASSTHRU('SELECT * FROM EMPLOYEE WHERE
-EMPNO='||''''||EmpID||'''');\
-\
-DECLARE DbRecords REFERENCE TO Emp.EmpRecord;\
-\
-CREATE FIELD OutputRoot.JSON.Data.Employee.{EmpInFoType};\
-DECLARE outDetailsRef REFERENCE TO
-OutputRoot.JSON.Data.Employee.{EmpInFoType};\
-\
-IF CONTAINS(EmpInFoType, 'Professional') THEN\
-SET SchemaName = 'EmpProDet';\
-ELSEIF CONTAINS(EmpInFoType, 'Personal') THEN\
-SET SchemaName = 'EmpPersonDet';\
-END IF;\
-\
-EVAL('CALL '||SchemaName||'.EmpDetails(outDetailsRef,
-DbRecords);');\
-\
+CREATE FIELD OutputRoot.JSON.Data.Employee.{EmpInFoType};
+
+DECLARE outDetailsRef REFERENCE TO OutputRoot.JSON.Data.Employee.{EmpInFoType};
+
+IF CONTAINS(EmpInFoType, 'Professional') THEN SET SchemaName = 'EmpProDet';
+ELSEIF CONTAINS(EmpInFoType, 'Personal') THEN SET SchemaName = 'EmpPersonDet';
+END IF;
+
+EVAL('CALL '||SchemaName||'.EmpDetails(outDetailsRef, DbRecords);');
+
 RETURN TRUE;
+```
 
 This video also shows you how to use EVAL.
-(https://youtu.be/0CX9--Y2jOk?si=h0r2PTL2h-y_qw-x). EVAL saves you from
-having to write lots of if statements by evaluating the expression on
-the fly using variables.
+[EVAL function in ESQL || Explained with two Practical Examples](https://youtu.be/0CX9--Y2jOk?si=h0r2PTL2h-y_qw-x). EVAL saves you from having to write lots of if statements by evaluating the expression on the fly using variables.
 
-[ ]
+Example:
+```
+SET OutputRoot.JSON.Data.Result = EVAL('num1'||mathop||'num2');
+```
 
-[Example:]
+Instead of:
 
-[ ]
-
-SET OutputRoot.JSON.Data.Result =
-EVAL('num1'||mathop||'num2');
-
-
-
-[Instead of:]
-
-
-
-[IF mathop = '+' THEN]
-
-[ ]{.Apple-tab-span}SET {.s4}OutputRoot.JSON.Data.Result = num1 +
-num2;
-
-[ ]
+```
+IF mathop = '+' THEN
+  SET OutputRoot.JSON.Data.Result = num1 + num2;
+```
 
 # Shared variable and ATOMIC block
 
+[What is Atomic block in ESQL?](https://youtu.be/u5-r4H6PvIY?si=kVKM9JrdJnXVlj6p)
 
+```
+DECLARE MYROW ROW; --A row variable contains an array
+```
 
-[https://youtu.be/u5-r4H6PvIY?si=kVKM9JrdJnXVlj6p]
+ROW SHARED variables can hold complex tree structure. A shared ROW can contain the result of a SELECT on the database table being cached.
 
-[ ]
-
-[DECLARE MYROW ROW; --A row variable contains an array]
-
-[\*\* \*\*]
-
-ROW SHARED variables can hold complex tree structure. A shared ROW can
-contain the result of a SELECT on the database table being cached.
-
-[ ]
-
+```
 DECLARE CACHE SHARED ROW; --For example, a database table called
-"AIRPORTS" contains two columns, "CODE" and "CITY". This code loads the
-cache:
-
-SET CACHE.AIRPORT[] = SELECT A.CODE, A.CITY FROM Database.AIRPORTS AS
-A;
-
-[ ]
-
-[The CACHE variable will be populated like this:]
+"AIRPORTS" contains two columns, "CODE" and "CITY". This code loads the cache:
+SET CACHE.AIRPORT[] = SELECT A.CODE, A.CITY FROM Database.AIRPORTS AS A;
+```
+The CACHE variable will be populated like this:
 
 -- CACHE.AIRPORT[1].CODE = AAA
 
@@ -1102,31 +1042,27 @@ A;
 
 -- CACHE.AIRPORT[2].CITY = Arrabury
 
-[ ]
-
 Accessing ROW SHARED variables is much faster than retrieving the data
 from the Database directly depending the amount of data retrieved. The
 first time after the ESQL code is run CACHE shared variable is in
 memory. The next time it is invoked it does not have to reload from the
 database as it is cached.
 
-[ ]
-
 The problem with this cache structure is that it doesn't scale. A user
 trace will show that SELECT scans the table sequentially until it finds
 a row that satisfies the WHERE clause. As the table grows, the search
 gets slower. There comes a point when it's faster to drop the cache and
-go to the database each time. Ref:
-[[https://www.websphereusergroup.co.uk/wug/presentations/38/EfficientCaching\_-V2.pptx.pdf]{.s7}](https://www.websphereusergroup.co.uk/wug/presentations/38/EfficientCaching_-V2.pptx.pdf)
+go to the database each time. 
 
-[ ]
+> Ref:
+[Efficient Caching](https://www.websphereusergroup.co.uk/wug/presentations/38/EfficientCaching\_-V2.pptx.pdf)
+
+![Screenshot from Youtube vid](IIB.fld/SharedVar_Main.png)
 
 Whatever is stored in a shared variable is held in cache memory until
 we refresh the execution group, application or application flow using
 'mqsireload' for example. Other message flows in the same execution
 group access the shared row variable value set in a message flow.
-
-[ ]
 
 Once a cached shared row is populated then every time the flow will run
 it will only have what was loaded at the time of the SQL query. This
@@ -1139,11 +1075,9 @@ queue manager. This could be referenced in the properties of the same
 flow but in a separate MQ Input node connected to a Compute node. Within
 the Compute node you can empty the shared row variable:
 
-[ ]
-
-[SET CACHE = NULL;]
-
-[ ]
+```
+SET CACHE = NULL;
+```
 
 When ESQL code in other compute nodes access the variable, they will
 see it is empty, which prompts another SELECT against the database. If
@@ -1151,224 +1085,62 @@ the "SET CacheTable = NULL;" is executed just before "SET
 OutputRoot.XMLNSC.Data = CacheTable;" then the output message assembly
 will have no data.
 
-[ ]
-
-You have to use atomic blocks
-(https://youtu.be/u5-r4H6PvIY?si=V3_4tA09WjTF0WRn) within the same
+To get around this use atomic blocks [(reference the link at the beginning of this header)](#shared-variable-and-atomic-block)
+ within the same
 schema to ensure that threads are executed serially (only 1 thread is
 executed at a time). That way we can update the shared row variable in a
 thread safe manner.
 
-[ ]
 
-+-----------------------------------------------+
-| [shared_atomic_Refresh_Cache.esql] |
-+-----------------------------------------------+
+shared_atomic_Refresh_Cache.esql
+```  
+  BEGIN
+    X: BEGIN ATOMIC
+      SET CacheTable = NULL;  --Empties CacheTable
+    END X;
+      RETURN TRUE;
+  END;
+```
 
-+-----------------------------------------------------------------------+
-|  |
-+-----------------------------------------------------------------------+
+shared_atomic_Compute.esql
 
-+-----------------+
-| [BEGIN] |
-+-----------------+
+```
+  BEGIN
+    X: BEGIN ATOMIC
+      IF NOT EXISTS(CacheTable.[]) THEN -- Does not check if CACHE exists but if data is in it.
+        SET CacheTable.Result[] = PASSTHRU('SELECT R.FIRSTNME,R.LASTNAME FROM EMPLOYEE AS R');
+        SET OutputRoot.XMLNSC.Data = CacheTable;
+      
+      ELSE
+        SET OutputRoot.XMLNSC.Data = CacheTable;
+      END IF;
+    END X;
+    RETURN TRUE;
+  END;
+```
 
-+-----------------------------------------------------------------------+
-|  |
-+-----------------------------------------------------------------------+
-
-+-----------------------------------+
-| [        X: BEGIN ATOMIC] |
-+-----------------------------------+
-
-+-----------------------------------------------------------------------+
-|  |
-+-----------------------------------------------------------------------+
-
-+-------------------------------------------------+
-| [               SET CacheTable = NULL;] |
-+-------------------------------------------------+
-
-+-----------------------------------------------------------------------+
-|  |
-+-----------------------------------------------------------------------+
-
-+---------------------------+
-| [        END X;] |
-+---------------------------+
-
-+-----------------------------------------------------------------------+
-|  |
-+-----------------------------------------------------------------------+
-
-+---------------------------------+
-| [        RETURN TRUE;] |
-+---------------------------------+
-
-+-----------------------------------------------------------------------+
-|  |
-+-----------------------------------------------------------------------+
-
-+-----------------+
-| [END;] |
-+-----------------+
-
-+-----------------------------------------------------------------------+
-|  |
-+-----------------------------------------------------------------------+
-
-+-----------------------------------------------------------------------+
-|  |
-+-----------------------------------------------------------------------+
-
-| |
-|---------------------------|
-| [Empties CacheTable] |
-
-+-----------------------------------------+
-| [shared_atomic_Compute.esql] |
-+-----------------------------------------+
-
-+-----------------------------------------------------------------------+
-|  |
-+-----------------------------------------------------------------------+
-
-+-----------------+
-| [BEGIN] |
-+-----------------+
-
-+-----------------------------------------------------------------------+
-|  |
-+-----------------------------------------------------------------------+
-
-+-----------------------------------+
-| [        X: BEGIN ATOMIC] |
-+-----------------------------------+
-
-+-----------------------------------------------------------------------+
-|  |
-+-----------------------------------------------------------------------+
-
-+---------------------------------------------------------------+
-|                IF NOT EXISTS(CacheTable.[]) THEN |
-+---------------------------------------------------------------+
-
-+-----------------------------------------------------------------------+
-|  |
-+-----------------------------------------------------------------------+
-
-+---------------------------------------------------------------------+
-|                        SET CacheTable.Result[] = |
-| PASSTHRU('SELECT R.FIRSTNME,R.LASTNAME FROM EMPLOYEE AS |
-| R'); |
-+---------------------------------------------------------------------+
-
-+-----------------------------------------------------------------------+
-|  |
-+-----------------------------------------------------------------------+
-
-+---------------------------------------------------------------------+
-|                        SET OutputRoot.XMLNSC.Data = |
-| CacheTable; |
-+---------------------------------------------------------------------+
-
-+-----------------------------------------------------------------------+
-|  |
-+-----------------------------------------------------------------------+
-
-+-------------------------------+
-| [               ELSE] |
-+-------------------------------+
-
-+-----------------------------------------------------------------------+
-|  |
-+-----------------------------------------------------------------------+
-
-+---------------------------------------------------------------------+
-|                        SET OutputRoot.XMLNSC.Data = |
-| CacheTable; |
-+---------------------------------------------------------------------+
-
-+-----------------------------------------------------------------------+
-|  |
-+-----------------------------------------------------------------------+
-
-+-----------------------------------+
-| [               END IF;] |
-+-----------------------------------+
-
-+-----------------------------------------------------------------------+
-|  |
-+-----------------------------------------------------------------------+
-
-+---------------------------+
-| [        END X;] |
-+---------------------------+
-
-+-----------------------------------------------------------------------+
-|  |
-+-----------------------------------------------------------------------+
-
-+---------------------------------+
-| [        RETURN TRUE;] |
-+---------------------------------+
-
-+-----------------------------------------------------------------------+
-|  |
-+-----------------------------------------------------------------------+
-
-+-----------------+
-| [END;] |
-+-----------------+
-
-+-----------------------------------------------------------------------+
-|  |
-+-----------------------------------------------------------------------+
-
-+-----------------------------------------------------------------------+
-|  |
-+-----------------------------------------------------------------------+
-
-| |
-|-----------------------------------------------------|
-| [Both atomic blocks must use the same X label] |
-
-[ ]
-
-[ ]
+Both atomic blocks must use the same X label. Now the CacheTable cache will not be refreshed just before setting the output root since the X atomic blocks have to run one after the other in their entirety.
 
 One advantage of the Global Cache over ESQL shared variables is that
-the cache can be shared between message flows, integration servers /
-execution groups, and integration buses / brokers (recall that the scope
+the cache can be shared between message flows, integration servers
+execution groups, and integration brokers (recall that the scope
 of ESQL shared variables is the message flow). However, because Global
 Cache uses the JVM to store data (Udemy 18) it is slower than shared
 variables which use cache.
 
-[ ]
-
-[\*\* \*\*]
 
 # The THE function returns the first element of a list.
 
-[\*\* \*\*]
+*Syntax*
 
-[Syntax]
+THE(ListExpression)
 
-[THE(ListExpression)]
+If *ListExpression* contains one or more elements; THE
+returns the first element of the list. In all other cases, it returns an empty list.
 
-[If ]*ListExpression*{.s8} contains one or more elements; THE
-returns the first element of the list. In all other cases, it returns an
-empty list.
+*Restrictions*
 
-[ ]
-
-[Restrictions]
-
-*ListExpression*{.s8}[ must be a SELECT expression.]
-
-[\*\* \*\*]
-
-[ ]
+*ListExpression* must be a SELECT expression.
 
 # DATE TIME TRANSFORMATION
 
@@ -1376,128 +1148,68 @@ IBM help "formatting and parsing date times as strings" under help in
 the toolkit (Search for parsing date and time). How do we interpret date
 formats?  12-09-2015 12:05pm. This is called a timestamp as it has a
 time component  The first 2 digits are the day in the month. We want to
-transform to :\
+transform to :
 Month in 3 letters/day in the month with 0 as padding/4 digits
 year:hours,mins,seconds
 
+```
+        DECLARE INDATE CHARACTER '12-09-2015 12:05pm';
 
-
-[        DECLARE INDATE CHARACTER '12-09-2015 12:05pm';]
-
-
-
-[        DECLARE INDATEFORMAT CHARACTER 'd-MM-yyyy h:mma';]
-
-
-
---This tells us how to interpret the string in a format IIB
-understands
-
-
-
-DECLARE STDDATE TIMESTAMP CAST(INDATE AS TIMESTAMP FORMAT
-INDATEFORMAT);
-
-
-
-[        --We have to change it to a standard date using cast]
-
-
-
-[        DECLARE OUTDATEFORMAT CHARACTER 'MMM/dd/yyyy:hh,mm,ss';]
-
-
-
-DECLARE OUTDATE CHARACTER CAST(STDDATE AS CHARACTER FORMAT
-OUTDATEFORMAT);
-
-
-
-[    ]
+        DECLARE INDATEFORMAT CHARACTER 'd-MM-yyyy h:mma';
+        --This tells us how to interpret the string in a format IIB understands
+        DECLARE STDDATE TIMESTAMP CAST(INDATE AS TIMESTAMP FORMAT INDATEFORMAT);
+        --We have to change it to a standard date using cast
+        DECLARE OUTDATEFORMAT CHARACTER 'MMM/dd/yyyy:hh,mm,ss';
+        DECLARE OUTDATE CHARACTER CAST(STDDATE AS CHARACTER FORMAT OUTDATEFORMAT);
+```
 
 He then deploys the application to the execution group.  Iibguru then
-sends a blank message to the IN queue that mqinput node that connects to
-the esql above to trigger the code. The thread stops at the breakpoint
+sends a blank message to the IN queue that mqinput node connects to.
+Then the esql above triggers the code. The thread stops at the breakpoint
 in between. Then he steps into the code, then steps over. He can see the
-values of the DECLARED variables as they change
+values of the DECLARED variables as they change.
 
 # INTERVAL DATATYPE
-
 How many either days, months, years (up to you) between either 2
 timestamps or dates. Uncomment --- CALL CopyMessageHeaders(); so that we
 can send a success message to the out queue.
 
-[ ]
+```
+DECLARE INDATE DATE '2009-09-17';
+--- The type is DATE not CHARACTER since it is a standard date format.
+--- When you run with breakpoints you will observe the variable as
+--- INDATE:DATE:java.util.GregorianCalendar[time=12531....] 
+--- & OUTDATE as 2009-10-17
+DECLARE OUTDATE DATE INDATE+INTERVAL '1' MONTH;
+```
 
-[        DECLARE INDATE DATE '2009-09-17';]
-
---- The type is DATE not CHARACTER since it is a standard date
-format. When you run with breakpoints you will observe the variable as
-INDATE:DATE:java.util.GregorianCalendar[time=12531....] & OUTDATE as
-2009-10-17
-
-
-
-[        DECLARE OUTDATE DATE INDATE+INTERVAL '1' MONTH;]
-
-
-
-\
 If you want to see what day this date is:
 
-[ ]
-
-[        DECLARE DAYFORMAT CHARACTER 'EEE';]
-
-
-
+```
+DECLARE DAYFORMAT CHARACTER 'EEE';
 DECLARE DAYNAME CHARACTER CAST(OUTDATE AS CHARACTER FORMAT
 DAYFORMAT);
+```
+---DAYFORMAT is EEE, DAYNAME is Sat
+---if DAYFORMAT is EEEE, DAYNAME is Saturday
+---if DAYFORMAT is 'EEEE W', DAYNAME is Saturday 3 where 3 is the 3rd Saturday of that month
 
-
-
-\
----DAYFORMAT is EEE, DAYNAME is Sat\
----if DAYFORMAT is EEEE, DAYNAME is Saturday\
----if DAYFORMAT is 'EEEE W', DAYNAME is Saturday 3 where 3 is the 3rd
-Saturday of that month
-
-[ ]
-
-[        DECLARE SUBDATE CHARACTER (CURRENT_DATE-INDATE) YEAR;]
-
-
-
----This will return an interval string not a DATE type. Hence
-we use CHARACTER not DATE.
-
-[        SUBDATE Value is INTERVAL '8' YEAR]
-
-
-
-DECLARE SUBDATE CHARACTER (CURRENT_DATE-INDATE) YEAR TO
-MONTH;
-
-[        --- SUBDATE Value is INTERVAL '7-09' YEAR TO MONTH]
-
-
-
-[ ]
-
-[ ]
+```
+DECLARE SUBDATE CHARACTER (CURRENT_DATE-INDATE) YEAR;
+---This will return an interval string not a DATE type. Hence we use CHARACTER not DATE.
+SUBDATE Value is INTERVAL '8' YEAR]
+DECLARE SUBDATE CHARACTER (CURRENT_DATE-INDATE) YEAR TO MONTH;
+--- SUBDATE Value is INTERVAL '7-09' YEAR TO MONTH
+```
 
 If you want the differences in hours then change the INDATE
 declaration from DATE type to TIMESTAMP type:
 
-[        DECLARE INDATE TIMESTAMP '2009-09-17 13:53:25';]
-
-
-
-[        You also need to change the SUBDATE to:]
-
-DECLARE SUBDATE CHARACTER (CURRENT_TIMESTAMP-INDATE)
-HOUR;
-
+```
+DECLARE INDATE TIMESTAMP '2009-09-17 13:53:25';
+--- You also need to change the SUBDATE to:
+DECLARE SUBDATE CHARACTER (CURRENT_TIMESTAMP-INDATE) HOUR;
+```
 
 
 # Transformation Extender
@@ -1506,16 +1218,17 @@ CloudPak is a pack made up of IIB, MQ, WTX, DataPower & API Connect.
 WTX is coding free transformation but in IIB we can do transformation in
 5 coding languages. Data transformation engine at the core of IBM TX.
 Consider the following data stream for which ITX has an adapter Paul
-Brett Operations 1/4/1970\
+Brett Operations 1/4/1970.
 The data stream is read into a type tree. Consider this tree to be a
 type of bucket. This bucket can hold further buckets. This can be
-transformed into: Paul Brett Operations 1970-04-01\
+transformed into: Paul Brett Operations 1970-04-01.
 The output adapter sends the XML to either MQ, a file or something else.
 WTX protocol support is less.
 
 # Message Set, Message definition creation
 
-https://youtu.be/ZC_uDGzhKIs?si=Bz4sfjpp9vF-Wpbs. Udemy Section 15:60.
+> Reference [IIB Message set, Message Definition creation](https://youtu.be/ZC_uDGzhKIs?si=Bz4sfjpp9vF-Wpbs) & [Udemy Section 15:60](https://www.udemy.com/course/ibm-integration-bus-with-practicals/learn/lecture/28717792#overview).
+
 For XML and JSON Message Modelling is optional. But for CSV, Flatfile,
 EDI, HL7, SWIFT, COBOL etc it is mandatory. Message model schema files
 are the preferred way to model messages for most data formats. How are
@@ -1523,23 +1236,17 @@ you going to create these and implement them as part of the message
 flow? A request or response message needs to be defined. What are the
 individual fields or field values contained therein? Parsing is
 segregating the different parts of the message and interpreting what
-each part means.\
+each part means.
 A message set can contain 1 or more message definitions. A message set
 has a unique ID.
 
-![](IIB.fld/image004.png){style="width: auto;height: auto;"}
-
-[ ]
-
-
-
-[ ]
+![Message Set](IIB.fld/image004.png)
 
 The message definition defines the field names, data types, delimiters.
 This definition helps with say a message transformation. Consider the
-following data 123:raju:detroitCRLF\
+following data 123:raju:detroitCRLF.
 The carriage return, line feed can be seen in Notepad Plus Plus. CRLF
-appears in Windows, LF appears if created in Linux.\
+appears in Windows, LF appears if created in Linux.
 In IIB Toolkit go to New -> Other -> Message Set. Give it a name of
 Delimited_ms, give Delimited_msp for the project name. Click next then
 select the type of message data most appropriate. We choose Text data.
@@ -1547,31 +1254,27 @@ Take a note of the next windows message domains (MRM which is the
 default), wire formats (Text1), and Schemas (None). You will see your
 newly created messageSet. Change the default wire format to Text1.
 
-\
 Remember message set ID is different from MQ message ID. The latter is
 an MQMD (message queue message definition)
 property.
 
-\
 You then right click on Message definition -> New -> Other -> Message
-definition -> Message Definition File\
+definition -> Message Definition File.
 Click Next and name the file colonseparated_msd. Right click on Elements
-and Attributes -> create Global element (lowest level)\
+and Attributes -> create Global element (lowest level).
 The 3 fields combine to make a single record. That record should be
 given a name and the name added to Types. Add it as a Complex type. In
 order to tell IIB that ERECORD is a composite of the 3 fields right
-click on ERECORD then Add Element Reference.\
-\\
+click on ERECORD then Add Element Reference.
 
-![](IIB.fld/image005.png)
+![Complex type](IIB.fld/image005.png)
 
-\
 You need to go to Properties of ERECORD then select all elements
 delimited then add colon for delimiter. When you test this using
 MQInputNode you need to set the correct wire mode else you will get
 "Invalid Wire format retrieved". This message is a sign that you have
 not given Broker the correct definitions for it to interpret the text
-received.\
+received.
 We need the message definition we created to be referenced correctly in
 the MQInputNode -> Input Message Parsing. Under Message model it should
 show you the message set but it does not unless you let the application
@@ -1579,12 +1282,11 @@ have access to the MS which is an independent resource. You need to
 change the applications properties -> Project References -> Choose
 Delimited_msp. NOW you can select Delimited_ms in the Input Message
 Parsing. This also allows you to select ERECORD as the Complex message
-definition. Physical format is the Text1 wire format.\
+definition. Physical format is the Text1 wire format.
 When you see the Variables under the running thread you will not see the
 ERECORD Complex type since it has been replaced by the MRM. Any
 top-level Complex type of a text delimited message definition is going
-to become MRM. You will see the children of MRM (ENO,
-ENAME,ECITY).
+to become MRM. You will see the children of MRM (ENO,ENAME,ECITY).
 
 # Message Set, Message definition creation for XML
 
@@ -1598,7 +1300,7 @@ files.
 
 # Message modelling
 
-JAN192021-IIB JCN_ForLoop&JDBC&ModellingPt1 18 minutes. The modelling
+[JAN192021-IIB JCN_ForLoop&JDBC&ModellingPt1 18 minutes](https://drive.google.com/file/d/1dm5ErDsUbQ80Ln-EGWGrCF6UABv85uNE/view?usp=share_link). The modelling
 of a message can be achieved in the message set and definition as above
 or within an IIB Message Model as introduced in version 8. You can
 reference the Message Set and one of it's Definition objects in code.
@@ -1621,24 +1323,19 @@ Message -> Properties in debug. If you want to convert from, say XML,
 to CSV you cannot set the MQInput node properties in the MQOuput node.
 You need a Compute node with this:
 
-[ ]
-
-[        SET OutputRoot.Properties.MessageSet='csvSingleLine';]
-
-SET
-OutputRoot.Properties.MessageType='{}:TargetMessag';
-
-[        SET OutputRoot.Properties.MessageFormat='Text_CSV';]
-
-
+```
+SET OutputRoot.Properties.MessageSet='csvSingleLine';
+SET OutputRoot.Properties.MessageType='{}:TargetMessag';
+SET OutputRoot.Properties.MessageFormat='Text_CSV';
+```
 
 If your incoming data contains a header and a trailer, then use
 record-oriented text and select 'The first record is a header' in the
 wizard.
 
-![](IIB.fld/MessModWiz.png){style="width: 350px;height: 200px;"}
+![Message Model](IIB.fld/MessModWiz.png)
 
-JAN212021-IIB ModellingPt2&Mapping 12 minutes. We saw the
+[JAN212021-IIB ModellingPt2&Mapping 12 minutes](https://drive.google.com/file/d/1ESpoPURJo-q4rYdCjFCHWRGS9_VoTbJ8/view?usp=share_link). We saw the
 transformations with ESQL and the JCN. If you don't want to write a
 single line of code, then the mapping transformation node helps.
 However, you cannot do complex transformation using the mapping node.
@@ -1658,169 +1355,125 @@ JSON.
 When you send CSV data set the Content-Type to text/csv in the Postman
 client. You might have a parsing issue depending on whether the text
 file has CR & LF at the end of the line (windows) or just LF (Unix,
-macOS). You can run xxd - make a hex dump or do the reverse (reference:
-https://youtu.be/VRwFvt5eHeA?si=X3LOsTz6fdPoQrQS) e.g. 'xxd
+macOS). You can run xxd - make a hex dump or do the reverse (reference:[Linux Tips and Tricks - Line Feed and Carriage Returns]
+(https://youtu.be/VRwFvt5eHeA?si=X3LOsTz6fdPoQrQS) e.g. 'xxd
 Bill_Piped_delim.csv'. If your file does not have CR then remove CR
 from the sequence in the Message Model. Reference:
-https://youtu.be/qXwYJGsgw8c?si=ahdxMt1nlHJ6tVI4 15:32. I can use 'od
--c filename' in order to see the escape characters. Remember that \\n
-is a line feed.
+[iib - convert csv to xml  15:32](https://youtu.be/qXwYJGsgw8c?si=ahdxMt1nlHJ6tVI4). I can use 'od
+-c filename' in order to see the escape characters. Remember that \\n is a line feed.
 
 # Mapping XML from an XSD
 
-JAN212021-IIB ModellingPt2&Mapping 16 minutes. The
+[JAN212021-IIB ModellingPt2&Mapping 16 minutes](https://drive.google.com/file/d/1ESpoPURJo-q4rYdCjFCHWRGS9_VoTbJ8/view?usp=share_link). The
 IBM/IIBT10/workspace/LIB_MODEL/Edetails.xsd file models the data for the
 incoming XML. It is generated online using an existing XML file as a
 template. The XSD file validates the XML and also speeds up development
 of your integration applications by enabling ESQL content assist and
 graphical maps.
 
-[ ]
-
 The MAP_PRO application references the LIB_MODEL we created. When we
 create a new message model file from the Edetails.xsd file we import it
 into our workspace library LIB_MODEL.
-
-[ ]
 
 When we double click on the mapping node a wizard opens. We choose the
 'Edetails' model as the map inputs and the 'csvone' model as the map
 outputs. Click next then choose DFDL as the output domain. This is
 correct since we created 'csvone', using DFDL.
 
-[ ]
+The graphical map opens up.
 
-[The graphical map opens up.]
-
-![](../images/mapping.png){style="width: 400px; height: 250px;"}
-
-[ ]
-
-
-
-[ ]
+![Grapical Map](../images/mapping.png)
 
 The root of the left XML message assembly is Edetails. The Edetails
 [1..1] tells us there is at least one details group. The input XML
 looks like this.
 
-[ ]
-
-[\<Edetails>]
-
-[    \<Ename>David\</Ename>]
-
-[       \<Eid>478\</Eid>]
-
-[       \<Estate>Juhu\</Estate>]
-
-[    \<Ecountry>IN\</Ecountry>]
-
-[\</Edetails>]
-
-[ ]
-
-[ ]
+```
+<Edetails>
+  <Ename>David</Ename>
+  <Eid>478</Eid>
+  <Estate>Juhu</Estate>
+  <Ecountry>IN</Ecountry>
+</Edetails>
+```
 
 The fields [1..1] means there must be at least one occurrence in the
 output assembly. But the input assembly does not move any values to
 those fields. That is why we Assign a dummy value in the Assign
 Properties -> General -> Value field.
 
-[ ]
-
 # Mapping XML with multiple records from an XSD
 
-JAN192021-IIB JCN_ForLoop&JDBC&ModellingPt1.mp4. You can edit your
+[JAN192021-IIB JCN_ForLoop&JDBC&ModellingPt1](https://drive.google.com/file/d/1dm5ErDsUbQ80Ln-EGWGrCF6UABv85uNE/view?usp=share_link). You can edit your
 mapping so that it has different map inputs and outputs. You can delete
 the existing input/output using the red cross. From this XML we modelled
 mulxml.xsd.
 
-[ ]
+```
+<Empdetail>
+  <Emp>
+    <Ename>David</Ename>
+    <Eid>478</Eid>
+    <Estate>Juhu</Estate>
+    <Ecountry>IN</Ecountry>
+    <Eage>35</Eage>
+    <Egend>m</Egend>
+    <Edoj>1222</Edoj>
+  </Emp>
+  <Emp>
+    <Ename>Amit</Ename>
+    <Eid>3269</Eid>
+    <Estate>Osterley</Estate>
+    <Ecountry>UK</Ecountry>
+    <Eage>52</Eage>
+    <Egend>m</Egend>
+    <Edoj>1217</Edoj>
+  </Emp>
+</Empdetail>
+```
 
-[\<Empdetail>]
-
-[\<Emp>]
-
-[\<Ename>David\</Ename>]
-
-[\<Eid>478\</Eid>]
-
-[\<Estate>Juhu\</Estate>]
-
-[\<Ecountry>IN\</Ecountry>]
-
-[\<Eage>35\</Eage>]
-
-[\<Egend>m\</Egend>]
-
-[\<Edoj>1222\</Edoj>]
-
-[\</Emp>]
-
-[\<Emp>]
-
-[\<Ename>Amit\</Ename>]
-
-[\<Eid>3269\</Eid>]
-
-[\<Estate>Osterley\</Estate>]
-
-[\<Ecountry>UK\</Ecountry>]
-
-[\<Eage>52\</Eage>]
-
-[\<Egend>m\</Egend>]
-
-[\<Edoj>1217\</Edoj>]
-
-[\</Emp>]
-
-[\</Empdetail>]
-
-[ ]
-
-JAN212021-IIB ModellingPt2&Mapping 35 minutes. Since both the XML and
+[JAN212021-IIB ModellingPt2&Mapping 35 minutes](https://drive.google.com/file/d/1ESpoPURJo-q4rYdCjFCHWRGS9_VoTbJ8/view?usp=share_link). Since both the XML and
 CSV model are multiple records, you go with the For Each in the Mapping
 GUI.
 
-[ ]
-
 # Web Services
 
-Synchronous versus Asynchronous.
-[[https://youtu.be/N5Ky-mz6n-8]{.s7}](https://youtu.be/N5Ky-mz6n-8)
+[Synchronous versus Asynchronous](https://youtu.be/N5Ky-mz6n-8)
 
-![](IIB.fld/ProdConsHTTPSOAP.png){style="width: 300px;height: 100px;"}
+![ProducerConsumer](IIB.fld/ProdConsHTTPSOAP.png)
 
 SOAP is only XML, but HTTP can handle any format be it XML, JSON,
 delimited, HL7 etc. SOAP is XML over HTTP or JMS HTTP + SSL = HTTPS but
-XML uses WS-SEC. 19DEC2020-IIBProdConsumeHTTP.mp4 23minutes
+XML uses WS-SEC. [DEC192020-IIB ProdConsumeHTTP.mp4 23minutes](https://drive.google.com/file/d/1Cid9C8_q_0l_EJ92kAf6MZP9tCe3-7Hg/view?usp=share_link)
 
 HTTPInput listens for a request whereas HTTPReply is responsible for
 responding to the consumer. HTTPInput listens on a port. There may be
 multiple web services listening on the same port. To differentiate use
 the path suffix for the URL
 
-[mqsireportproperties IIBGURU -e IIBGURU_EX -o HTTPConnector -r]
+```
+mqsireportproperties IIBGURU -e IIBGURU_EX -o HTTPConnector -r
+```
 
 HTTPInput can expose the service using different methods
 (GET,HEAD,POST,PUT,PATCH,DELETE,OPTIONS) so you can't expect just to
 hit with a browser.
 
-[Because the Transformation node has:]
+Because the Transformation node has:
 
-[SET FNAME=InputRoot.XMLNSC.EMPDET.EFNAME]
+```
+SET FNAME=InputRoot.XMLNSC.EMPDET.EFNAME
+```
 
-![](IIB.fld/image001.png){style="width: auto;height: auto;"}
+![XMLNSC structure](IIB.fld/image001.png)
 
-That means we are expecting the payload. GET does not have a payload.
+That means we are expecting a payload. GET does not have a payload.
 Coordination of the millions of requests going through this flow is via
 the LocalEnvironment -> Destination -> HTTP -> RequestIdentifier
 (some unique number). Whenever the flow applications replies back to the
 HTTP client it uses the same unique number.
 
-In google drive '[2020-12-19] IIB ProdConsumeHTTP' the IIB Demo as a
+In [DEC192020-IIB ProdConsumeHTTP.mp4](https://drive.google.com/file/d/1Cid9C8_q_0l_EJ92kAf6MZP9tCe3-7Hg/view?usp=share_link) the IIB Demo as a
 consumer and producer calling local HTTP Service and Internet
 Pokemon.
 
@@ -2094,7 +1747,7 @@ header follows the WebSphere® MQ message descriptor (MQMD) and precedes
 the message body, if present.
 
 What is the use of MQRFH2 header? You can pass application data to
-[other]{.s5} flows if the protocol is MQ. In the example below
+[other] flows if the protocol is MQ. In the example below
 the MQ Output puts a message to a queue called test2. That then triggers
 another message flow called SecondFlow.msgflow which has an MQ Input to
 receive the message. You cannot use Environment.Variables.orderPerson
@@ -2568,13 +2221,13 @@ traverse the Failure terminal only.{.s2}
 
 When the message that is not handled goes back to the IN queue the
 message is considered a poison message as it will not allow new messages
-to be 'MQGET' by the flow until the poison message is removed. The
+to be 'MQGET' by the flow until the poison message is removed since it is LIFO. The
 poison message can be handled by designating another queue as the
 backout queue to the IN via MQ Explorer or giving the backout queue name
 in the flow or setting a DLQ.21DEC2020-IIB FixHTTPProdCon_ESQLThrow 36
-minutes{.s2}
+minutes
 
-[ ]{.s2}
+
 
 # Try Catch node
 
@@ -2724,7 +2377,7 @@ group.
 
 [ ]
 
-[https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&ved=2ahUKEwiWyMPF9qPvAhW1WxUIHSSSD_cQFjAAegQIBBAD&url=https%3A%2F%2Fen.wikipedia.org%2Fwiki%2FSelf-signed_certificate&usg=AOvVaw1ulmEXUANNETSV5MnkQghm[]{.s15}](https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&ved=2ahUKEwiWyMPF9qPvAhW1WxUIHSSSD_cQFjAAegQIBBAD&url=https%3A%2F%2Fen.wikipedia.org%2Fwiki%2FSelf-signed_certificate&usg=AOvVaw1ulmEXUANNETSV5MnkQghm){.s5}
+[https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&ved=2ahUKEwiWyMPF9qPvAhW1WxUIHSSSD_cQFjAAegQIBBAD&url=https%3A%2F%2Fen.wikipedia.org%2Fwiki%2FSelf-signed_certificate&usg=AOvVaw1ulmEXUANNETSV5MnkQghm[]{.s15}](https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&ved=2ahUKEwiWyMPF9qPvAhW1WxUIHSSSD_cQFjAAegQIBBAD&url=https%3A%2F%2Fen.wikipedia.org%2Fwiki%2FSelf-signed_certificate&usg=AOvVaw1ulmEXUANNETSV5MnkQghm)
 
 [ ]
 
@@ -2860,7 +2513,7 @@ referred to as Little Endian.
 
 [\*\* \*\*]
 
-[https://iteritory.com/ibm-integration-bus-iib-aggregate-nodes-sample-with-http-web-services/[]{.s15}](https://iteritory.com/ibm-integration-bus-iib-aggregate-nodes-sample-with-http-web-services/){.s5}
+[https://iteritory.com/ibm-integration-bus-iib-aggregate-nodes-sample-with-http-web-services/[]{.s15}](https://iteritory.com/ibm-integration-bus-iib-aggregate-nodes-sample-with-http-web-services/)
 
 The following JSON message is sent to the REST API
 /aggregationcustomerapi/v1/customers/.
@@ -2929,7 +2582,7 @@ Propagation is a synchronous process. That is, the next statement
 (incrementing the counter in our example) is not executed until all the
 processing of the message in downstream nodes has completed. So that
 means the counter 'I' will be incremented after the
-[[http://localhost:7080/legacybackendservice/v1/customer/Amit]{.s7}](http://localhost:7080/legacybackendservice/v1/customer/Amit)
+[[http://localhost:7080/legacybackendservice/v1/customer/Amit]](http://localhost:7080/legacybackendservice/v1/customer/Amit)
 web service response is sent to the AggregateReply.
 
 After the while loop completes the return false command is run. This
@@ -2965,7 +2618,7 @@ responses are collected.
 should be the same. Our Aggregate Control & AggregateReply nodes have an
 Aggregate name AGGR.
 
-[https://ibmintegrationbus.wordpress.com/2019/06/14/aggregation-nodes/[]{.s15}](https://ibmintegrationbus.wordpress.com/2019/06/14/aggregation-nodes/){.s5}
+[https://ibmintegrationbus.wordpress.com/2019/06/14/aggregation-nodes/[]{.s15}](https://ibmintegrationbus.wordpress.com/2019/06/14/aggregation-nodes/)
 
 [ ]
 
@@ -3001,7 +2654,7 @@ Reference:
 [\*\* \*\*]
 
 [Connecting to Enterprise Information
-Systems[]{.s15}](https://www.ibm.com/docs/en/app-connect/12.0?topic=applications-connecting-enterprise-information-systems){.s5}
+Systems[]{.s15}](https://www.ibm.com/docs/en/app-connect/12.0?topic=applications-connecting-enterprise-information-systems)
 
 []WebSphere Broker Adapters Transport is a service that connects to
 EIS (such as SAP). To use the transport, your message flow must contain
@@ -3029,7 +2682,7 @@ data in the EIS.
 # How to use IBM App Connect with SAP (via RFC)
 
 [Connecting to SAP (via
-RFC)[]{.s15}](https://www.ibm.com/docs/en/app-connect/12.0?topic=hga-sap-via-rfc#index__connect__title__1){.s5}
+RFC)[]{.s15}](https://www.ibm.com/docs/en/app-connect/12.0?topic=hga-sap-via-rfc#index__connect__title__1)
 
 When you double click say a SAPRequest node an Adapter component
 selection window appears. Then click on import where you create your own
