@@ -1,3 +1,88 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Enterprise Application Integration](#enterprise-application-integration)
+- [Integration Nodes and servers](#integration-nodes-and-servers)
+- [Message Transformation](#message-transformation)
+- [Transformation using XSL in a message flow](#transformation-using-xsl-in-a-message-flow)
+      - [Source](#source)
+      - [Target](#target)
+- [Message Routing](#message-routing)
+  - [Filter node](#filter-node)
+  - [RouteToLabel node](#routetolabel-node)
+- [Message Enrichment](#message-enrichment)
+- [Protocol conversion (MQ, File, http, SOAP, SMTP, POP3, JMS, SFTP)](#protocol-conversion-mq-file-http-soap-smtp-pop3-jms-sftp)
+- [SOA (Service Oriented Architecture)](#soa-service-oriented-architecture)
+- [Toolkit](#toolkit)
+- [Application vs Integration Project](#application-vs-integration-project)
+- [ESQL native to IIB](#esql-native-to-iib)
+- [MOVE NEXTSIBLING vs CARDINALITY and [i] call in a WHILE loop](#move-nextsibling-vs-cardinality-and-i-call-in-a-while-loop)
+- [The MOVE statement](#the-move-statement)
+- [WHILE versus FOR loop](#while-versus-for-loop)
+- [Converting XMLNSC to JSON](#converting-xmlnsc-to-json)
+- [FileInput & FileOutput nodes](#fileinput--fileoutput-nodes)
+- [Difference between DECLARE varName CHAR FIELDNAME() & DECLARE varName REFERENCE TO](#difference-between-declare-varname-char-fieldname--declare-varname-reference-to)
+- [LEAVE statement](#leave-statement)
+- [ESQL field reference overview](#esql-field-reference-overview)
+- [Local, UDP (AKA External) & shared variables](#local-udp-aka-external--shared-variables)
+- [MQInputNode mode. How your messages will be processed](#mqinputnode-mode-how-your-messages-will-be-processed)
+- [MQOutputNode mode. How your messages will be processed](#mqoutputnode-mode-how-your-messages-will-be-processed)
+- [Scenario full queue MQOutputNode node](#scenario-full-queue-mqoutputnode-node)
+- [MQ Output](#mq-output)
+- [MQ Reply](#mq-reply)
+- [IIB Node Connecting to Database using ODBC pt1](#iib-node-connecting-to-database-using-odbc-pt1)
+- [IIB Node Connecting to Database using ODBC pt2](#iib-node-connecting-to-database-using-odbc-pt2)
+- [Oracle DB ESQL](#oracle-db-esql)
+- [PASSTHRU with EVAL](#passthru-with-eval)
+- [Shared variable and ATOMIC block](#shared-variable-and-atomic-block)
+- [The THE function returns the first element of a list.](#the-the-function-returns-the-first-element-of-a-list)
+- [DATE TIME TRANSFORMATION](#date-time-transformation)
+- [INTERVAL DATATYPE](#interval-datatype)
+- [Transformation Extender](#transformation-extender)
+- [Message Set, Message definition creation](#message-set-message-definition-creation)
+- [Message Set, Message definition creation for XML](#message-set-message-definition-creation-for-xml)
+- [Message modelling](#message-modelling)
+- [Mapping XML from an XSD](#mapping-xml-from-an-xsd)
+- [Mapping XML with multiple records from an XSD](#mapping-xml-with-multiple-records-from-an-xsd)
+- [Web Services](#web-services)
+- [SOAP Gateway mode](#soap-gateway-mode)
+- [Exposing SOAP webservice. WSDL creation](#exposing-soap-webservice-wsdl-creation)
+- [REST](#rest)
+- [HTTPS webservice](#https-webservice)
+- [Java and Java Compute Node](#java-and-java-compute-node)
+- [Connect DB JAVA type 4 driver](#connect-db-java-type-4-driver)
+- [Deciding Between ODBC and JDBC Drivers](#deciding-between-odbc-and-jdbc-drivers)
+- [Design, requirements gathering](#design-requirements-gathering)
+- [MQRFH2 Tree](#mqrfh2-tree)
+- [Publication Node](#publication-node)
+- [Shared vs Static Library.](#shared-vs-static-library)
+- [Compile BAR inline](#compile-bar-inline)
+- [BAR override](#bar-override)
+- [Global Cache](#global-cache)
+- [Opaque Parsing](#opaque-parsing)
+- [JCN code to access a message set](#jcn-code-to-access-a-message-set)
+- [Timeout Notification is controlled by Timeout Control](#timeout-notification-is-controlled-by-timeout-control)
+- [Failure and Catch terminals](#failure-and-catch-terminals)
+- [MQ Failure and Catch](#mq-failure-and-catch)
+- [Try Catch node](#try-catch-node)
+- [Propagation](#propagation)
+- [Event Monitoring](#event-monitoring)
+- [Event Monitoring using node properties](#event-monitoring-using-node-properties)
+- [$ mqsichangeflowmonitoring IIBGURU -e IIBGURU_EX -k EvalEmp -f](#-mqsichangeflowmonitoring-iibguru--e-iibguru_ex--k-evalemp--f)
+- [BIP8071I: Successful command completion.](#bip8071i-successful-command-completion)
+- [$ mqsireportflowmonitoring IIBGURU -e IIBGURU_EX -k EvalEmp -f](#-mqsireportflowmonitoring-iibguru--e-iibguru_ex--k-evalemp--f)
+- [BIP8911I: Monitoring settings for flow 'EVAL.PROC.EvalProc' in](#bip8911i-monitoring-settings-for-flow-evalprocevalproc-in)
+- [Event Monitoring using monitoring profile XML file](#event-monitoring-using-monitoring-profile-xml-file)
+- [Set up HTTPS web service](#set-up-https-web-service)
+- [Validation settings for input type nodes](#validation-settings-for-input-type-nodes)
+- [ASBITSTREAM in ESQL](#asbitstream-in-esql)
+- [Aggregation](#aggregation)
+- [SAP](#sap)
+- [How to use IBM App Connect with SAP (via RFC)](#how-to-use-ibm-app-connect-with-sap-via-rfc)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Enterprise Application Integration
 
 If you have disparate technologies like Java, DB, SAP etc in order to
@@ -306,12 +391,12 @@ schema must all have unique names.
 Modules for the Compute node, database node & filter node must all contain exactly 1 function called Main. This function should return a Boolean. Main is the entry point used by a message flow node when processing a message.
 
 ```
-CREATE COMPUTE MODULE FileNode1_Compute]
-       CREATE FUNCTION Main() RETURNS BOOLEAN]
+CREATE COMPUTE MODULE FileNode1_Compute
+       CREATE FUNCTION Main() RETURNS BOOLEAN
        BEGIN
 
             -- CALL CopyMessageHeaders(); // This will only copy the Properties & MQMD. NOT the XMLNSC as I < J.
-            -- CALL CopyEntireMessage();]
+            -- CALL CopyEntireMessage();
             RETURN TRUE;
 
        END;
@@ -1486,8 +1571,6 @@ SOAP Input node. If you choose gateway mode, then Validation is not
 enabled. In the default mode the WSDL will contain the rules to validate
 against.
 
-[ ]
-
 However even in Gateway mode the SOAP Input won't accept any kind of
 message; it still expects SOAP format. You will get an "Exception during
 creation of SOAP envelope structure" if your request is not SOAP XML
@@ -1495,46 +1578,41 @@ format. This is because the SOAP Input property's Input Message Parsing
 still has SOAP in the message domain setting even after choosing Gateway
 mode.
 
-[\*\* \*\*]
-
 # Exposing SOAP webservice. WSDL creation
 
 HTML page is human consumable. But a web service is code consumable.
-Imagine bits of code talking to each other.\
+Imagine bits of code talking to each other.
 A web service is either SOAP or more recently REST API. SOAP needs a
-WSDL file JAN132021-IIB Containerization_SOAP_Reseq. We also need a
+WSDL file [JAN132021-IIB Containerization_SOAP_Reseq](https://drive.google.com/file/d/1eOZELZKs3rqFAk2HFLeYyi3dSOFpxAfP/view?usp=share_link). We also need a
 message definition to describe the request and response data. Our
 calculator SOAP service will have a single message definition to define
-the numbers to be added and the result.\
-\
+the numbers to be added and the result.
+
 We now need to create a WSDL out of the message definition. Just right
-click on the mxsd then generate WSDL.\
+click on the mxsd then generate WSDL.
 WSDL (Web Service Description Language) is like an interface. You don't
 care what happens internally. You only care about how to interface with
-the service.\
+the service.
 At the upper level WSDL has a service, service has a binding, binding
 has a port type, port type has an operation, operation has a message
 then message has a data types. The lowest component is data type which
-is akin to an XSD.\
+is akin to an XSD.
 You then right click on Message definition -> New -> Other -> Message
 definition -> Message Definition File
 
 You need to specify the target namespace. This allows you to separate
-elements with similar names. JAN132021-IIB Containerization_SOAP_Reseq 9
-minutes. You also need to Generate WSDL definition. This requires a
-setting to allow this option in the toolkit.\\
-
-[ ]
+elements with similar names. [JAN132021-IIB Containerization_SOAP_Reseq 9
+minutes](https://drive.google.com/file/d/1eOZELZKs3rqFAk2HFLeYyi3dSOFpxAfP/view?usp=share_link). You also need to Generate WSDL definition. This requires a
+setting to allow this option in the toolkit.
 
 # REST
 
-Client \<-transfer---Representational Data---transfer>API
-[]{.s9}[ Server]
+Client <-transfer---Representational Data---transfer>API -> Server
 
 Below ReqAdd is a resource that is represented by intA & intB and their
 data types.
 
-JAN052021-IIB_REST. REST is an architectural concept. You are trying to
+[JAN052021-IIB_REST](https://drive.google.com/file/d/1XCa9mrnTIm-EZ4Y8gz68fTWYzb2jO_Ps/view?usp=share_link). REST is an architectural concept. You are trying to
 expose HTTP operations with appropriate HTTP methods. The equivalent to
 the WSDL file is the swagger document. This is where you define the
 request and response for GET, POST etc. You also define the data types
@@ -1551,6 +1629,7 @@ as well as the message flow.
 You then create a subflow for the operations in the REST API editor.
 Add a transformation node (Compute).
 
+```
 CAST with CCSID. InputRoot.Properties.CodedCharSetId (this will be
 populated by the Broker).
 
@@ -1561,9 +1640,10 @@ CCSID InputRoot.Properties.CodedCharSetId ENCODING
 InputRoot.Properties.Encoding);
 
 SET OutputRoot.JSON.Data.Result = CAST(InputRoot.HTTPInputHeader.One AS
-INTEGER)\*CAST(InputRoot.HTTPInputHeader.Two AS INTEGER); #JAN072021-IBM
+INTEGER) * CAST(InputRoot.HTTPInputHeader.Two AS INTEGER); #JAN072021-IBM
 IIB REST_GET_SSL_DB you can send data via the header and use the GET
 operation
+```
 
 You can add a Request schema via the model definition in the REST API
 editor then you can add one, two and three elements as string. You can
@@ -1571,7 +1651,7 @@ also use Parse Query String property in the HTTP Input node. If an HTTP
 request to http://localhost:7800/MessageFlow1/a%20space/b/c, the request
 is routed to the message flow that is deployed with the HTTPInput node,
 and the path segments are be placed in the local environment tree.
-JAN072021-IBM IIB REST_GET_SSL_DB 11:46
+[JAN072021-IBM IIB REST_GET_SSL_DB 11:46](https://drive.google.com/file/d/1o6TpH129InsCw8LWumlPOqUrfjgZU7O_/view?usp=share_link)
 
 But the problem with the specification is that the keys and values,
 even the number of parameters in your JSON request are not validated
@@ -1579,44 +1659,40 @@ even though your model specifically said the parameters have a certain
 case, are required and are type string. Only thing that is validated is
 that JSON is proper JSON format
 
-[ ]
-
-[ ]
-
 # HTTPS webservice
 
-JAN072021-IBM IIB REST_GET_SSL_DB 20:50. IIB you can either consume
+[JAN072021-IBM IIB REST_GET_SSL_DB 20:50](https://drive.google.com/file/d/1o6TpH129InsCw8LWumlPOqUrfjgZU7O_/view?usp=share_link). IIB you can either consume
 HTTPS webservice or expose it. HTTPS is a transport layer security. When
 you are exposing the service, you are the provider. You will have a
 keystore. When you are consuming you are the client, and you will have a
-truststore.\
-In ikeyman create a keystore of type JKS called tstore.jks.\
-\
+truststore.
+
+In ikeyman create a keystore of type JKS called tstore.jks.
+
 (JKS, Java Key Store. You can find this file at
 sun.security.provider.JavaKeyStore. This keystore is Java specific, it
 usually has an extension of jks. This type of keystore can contain
 private keys and certificates, but it cannot be used to store secret
 keys. Since it's a Java specific keystore, so it cannot be used in
 other programming languages. The private keys stored in JKS cannot be
-extracted in Java.)\
+extracted in Java.)
 The tstore.jks is protected by a password. If we are planning to use
 tstore.jks as a keystore (since we are the provider) then we choose
 personal certificate from the ikeyman dropdown. If we are using the file
 as a truststore (since we are consuming a service) we choose Signer
 certificates.
 
-![](../images/ca-diagram-b.png){style="width: 350px; height: 300px;"}
-
-[ ]
+![](../images/ca-diagram-b.png)
 
 # Java and Java Compute Node
 
-[JAN082021-IIB ExtJavaCall_DbNode_MQReplyPubSub. ]
+[JAN082021-IIB ExtJavaCall_DbNode_MQReplyPubSub](https://drive.google.com/file/d/1-IJJvmRgPg6FxfbKL6MKDrQzAwPy2h9c/view?usp=share_link)
 
---Creating Procedure For Calling External_Java_File(REGSTR.java),
-method RECORDS CREATE PROCEDURE EXJAVACALL(IN PRO1C INTEGER,IN PRO2C
-INTEGER,IN VNAME CHARACTER) RETURNS CHARACTER LANGUAGE JAVA EXTERNAL
-NAME "com.mss.REGSTR.RECORDS";
+```
+--Creating Procedure For Calling External_Java_File(REGSTR.java),method RECORDS
+CREATE PROCEDURE EXJAVACALL(IN PRO1C INTEGER,IN PRO2C INTEGER,IN VNAME CHARACTER) RETURNS CHARACTER LANGUAGE JAVA
+EXTERNAL NAME "com.mss.REGSTR.RECORDS";
+```
 
 IIB 10 uses IBM java which includes oracle java's 1.7 features. IBM
 Integration Bus v10 ships with Java 8 in IIB 10.0.0.11 and later fix
@@ -1629,13 +1705,15 @@ class files to an IIB node running 10.0.0.10 or earlier then you may see
 one of the following errors: JavaCompute node with an onInitialize
 method BIP4157E: The user-defined node 'Java Compute' could not be
 deployed. Details: java.lang.UnsupportedClassVersionError: JVMCFRE003
-bad major version class=Java18Test, offset=6.\
-MbJavaComputeNode is the superclass of all the classes used in JCN.\
-\
-JAN182021-IIB JCN_MessSet The Filtering message class in JCN wizard is
-not aimed for transformation. It can't construct the new message. It is
-used to check the data without changing it like a filter node, then
-apply filtering rules.\
+bad major version class=Java18Test, offset=6.
+
+![JCN Wizard](images/JCNWizard.png)
+
+MbJavaComputeNode is the superclass of all the classes used in JCN.
+
+[JAN182021-IIB JCN_MessSet 5:08](https://drive.google.com/file/d/1IzB8MWQEh2HPMKkJkW2gxkHXKuraxiGI/view?usp=share_link)
+The Filtering message class in JCN wizard is not aimed for transformation. It can't construct the new message. It is used to check the data without changing it like a filter node, then
+apply filtering rules.
 JCN template for Java Architecture for XML Binding (JAXB) class relates
 to marshalling and unmarshalling. Java classes are generated from an
 XSD. You can create new XML data using the constructor's classes and
@@ -1647,42 +1725,50 @@ methods and concrete methods. Abstract methods that are already
 implemented can be called in our JCN. With concrete methods are not
 implemented so we need to implement the declaration. The evaluate method
 is a concrete method that we need to implement. The evaluate method is
-akin to the Main method in ESQL\
-\\
+akin to the Main method in ESQL.
 
-public void evaluate(MbMessageAssembly inAssembly) throws MbException
-{\
-CREATE FUNCTION Main() RETURNS BOOLEAN\
-\\
+```
+public void evaluate(MbMessageAssembly inAssembly) throws MbException {
+  // evaluate is akin to the CREATE FUNCTION Main() RETURNS BOOLEAN
 
-//input tree accessing //MbMessage root1 = inAssembly.getMessage();
-MbElement root = inAssembly.getMessage().getRootElement(); //MbElement
-Body =
-inAssembly.getMessage().getRootElement().getLastChild().getLastChild();
-//String jlKt=""; //Outputtree pointer MbElement xmlnsc =
-outAssembly.getMessage().getRootElement().getLastChild(); //INPUT
+ 
+// MbMessage root1 = inAssembly.getMessage(); // access Input tree
+MbElement root = inAssembly.getMessage().getRootElement(); // InputRoot
+MbElement Body = inAssembly.getMessage().getRootElement().getLastChild().getLastChild(); // Data under XMLNSkC
+
+String jlKt=""; 
+
+// Outputtree pointer
+MbElement xmlnsc = outAssembly.getMessage().getRootElement().getLastChild();
+
+// INPUT
 MbElement empDetails=root.getLastChild().getLastChild().getFirstChild();
-//MbElement empDetails=root.getLastChild() String
-SName=empDetails.getFirstChild().getValueAsString(); String
-SmpID=empDetails.getFirstChild().getNextSibling().getValueAsString();
-String
-SmpAge=empDetails.getFirstChild().getNextSibling().getNextSibling().getValueAsString();
+// MbElement empDetails=root.getLastChild()
+String SName=empDetails.getFirstChild().getValueAsString();
+String SmpID=empDetails.getFirstChild().getNextSibling().getValueAsString();
+String SmpAge=empDetails.getFirstChild().getNextSibling().getNextSibling().getValueAsString();
+```
 
 The MbMessageAssembly is capable of holding the entire logical tree.
-The logical tree consists of message tree (properties, MQMD, XMLNSC),
-LocalEnvironment, Environment and ExceptionList \
-![](IIB.fld/Variables.png){style="width: 300px; height: 300px;"}
-![](../images/ac30330a.gif){style="width: 300px; height: 300px;"}
-![](IIB.fld/javaCNtree.png){style="width: 300px; height: 300px;"}\\
+The logical tree consists of 4 trees:
+
+1. message tree (properties, MQMD, XMLNSC)
+1. LocalEnvironment
+1. Environment
+1. ExceptionList
+
+![Message tree in debug](IIB.fld/Variables.png)
+![How java code traverse tree](../images/ac30330a.gif)
+![How code relates to tree](IIB.fld/javaCNtree.png)
 
 # Connect DB JAVA type 4 driver
 
-JAN072021-IBM IIB REST_GET_SSL_DB 32 minutes. Before we connected using
+[JAN072021-IBM IIB REST_GET_SSL_DB 32 minutes](https://drive.google.com/file/d/1o6TpH129InsCw8LWumlPOqUrfjgZU7O_/view?usp=share_link). Before we connected using
 the ODBC driver which is an operating system dependent driver. This is a
 pure java driver that connects using the Java API calls. The DB vendors
 like IBM and Oracle will provide the JAR files to connect to their
 databases. In IIB you need to enable some settings in the Configurable
-Services JAN192021-IIB JCN_ForLoop&JDBC&ModellingPt1 8 minutes. You can
+Services [JAN192021-IIB JCN_ForLoop&JDBC&ModellingPt1 8 minutes](https://drive.google.com/file/d/1dm5ErDsUbQ80Ln-EGWGrCF6UABv85uNE/view?usp=share_link). You can
 make changes that will be registered to the broker (right click broker
 in the toolkit, then select 'Start Web User interface'). Use the
 "mqsireportproperties brokerName -c AllTypes -c
