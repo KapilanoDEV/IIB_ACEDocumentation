@@ -175,11 +175,8 @@ you need to construct a message for the tree that will go to HTTP Reply
 
 ```
 CALL CopyMessageHeaders();
-
 DELETE FIELD OutputRoot.HTPResponseHeader;
-
 SET OutputRoot.XMLNSC.Acknowledgement = 'Sent to Downstream';
-
 PROPAGATE TO TERMINAL 'out1'; --this goes to the HTTP Reply which sends a response to the client that initiated the HTTP request
 ```
 (FYI if you added DELETE NONE to the last ESQL it will not delete the

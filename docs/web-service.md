@@ -13,7 +13,7 @@
 
 [Synchronous versus Asynchronous](https://youtu.be/N5Ky-mz6n-8)
 
-![ProducerConsumer](IIB.fld/ProdConsHTTPSOAP.png)
+![ProducerConsumer](../IIB.fld/ProdConsHTTPSOAP.png)
 
 SOAP is only XML, but HTTP can handle any format be it XML, JSON,
 delimited, HL7 etc. SOAP is XML over HTTP or JMS HTTP + SSL = HTTPS but
@@ -38,7 +38,7 @@ Because the Transformation node has:
 SET FNAME=InputRoot.XMLNSC.EMPDET.EFNAME
 ```
 
-![XMLNSC structure](IIB.fld/image001.png)
+![XMLNSC structure](../IIB.fld/image001.png)
 
 That means we are expecting a payload. GET does not have a payload.
 Coordination of the millions of requests going through this flow is via

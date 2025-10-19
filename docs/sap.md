@@ -9,12 +9,10 @@
 
 # SAP
 
-[\*\* \*\*]
-
 [Connecting to Enterprise Information
-Systems[]{.s15}](https://www.ibm.com/docs/en/app-connect/12.0?topic=applications-connecting-enterprise-information-systems)
+Systems](https://www.ibm.com/docs/en/app-connect/12.0?topic=applications-connecting-enterprise-information-systems)
 
-[]WebSphere Broker Adapters Transport is a service that connects to
+WebSphere Broker Adapters Transport is a service that connects to
 EIS (such as SAP). To use the transport, your message flow must contain
 one or more WebSphere Adapter nodes, for example the SAPRequest node
 (needs an outbound adapter component, which is used by the message flow
@@ -40,7 +38,7 @@ data in the EIS.
 # How to use IBM App Connect with SAP (via RFC)
 
 [Connecting to SAP (via
-RFC)[]{.s15}](https://www.ibm.com/docs/en/app-connect/12.0?topic=hga-sap-via-rfc#index__connect__title__1)
+RFC)](https://www.ibm.com/docs/en/app-connect/12.0?topic=hga-sap-via-rfc#index__connect__title__1)
 
 When you double click say a SAPRequest node an Adapter component
 selection window appears. Then click on import where you create your own

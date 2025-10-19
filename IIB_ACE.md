@@ -68,6 +68,10 @@
   - [Filter node](docs/routing.md#filter-node)
   - [RouteToLabel node](docs/routing.md#routetolabel-node)
 
+- [Security](docs/security.md)
+  - [HTTPS webservice](docs/security.md#https-webservice)
+  - [Set up HTTPS web service](docs/security.md#set-up-https-web-service)
+
 - [Deployment](docs/deployment.md)
   - [Compile BAR inline](docs/deployment.md#compile-bar-inline)
   - [BAR override](docs/deployment.md#bar-override)
@@ -82,6 +86,19 @@
 - [Monitoring](docs/monitoring.md)
   - [Event Monitoring using node properties](docs/monitoring.md#event-monitoring-using-node-properties)
   - [Event Monitoring using monitoring profile XML file](docs/monitoring.md#event-monitoring-using-monitoring-profile-xml-file)
+
+- [Troubleshooting](docs/troubleshooting.md)  
+  - [Validation settings for input type nodes](docs/troubleshooting.md#validation-settings-for-input-type-nodes)
+
+- [Web Services](docs/web-service.md)
+  - [Web Services](docs/web-service.md#web-services)
+  - [SOAP Gateway mode](docs/web-service.md#soap-gateway-mode)
+  - [Exposing SOAP webservice. WSDL creation](docs/web-service.md#exposing-soap-webservice-wsdl-creation)
+  - [REST](docs/web-service.md#rest)
+
+- [SAP](docs/sap.md)
+  - [SAP](docs/sap.md#sap)
+  - [How to use IBM App Connect with SAP (via RFC)](docs/sap.md#how-to-use-ibm-app-connect-with-sap-via-rfc)
 
 
 
