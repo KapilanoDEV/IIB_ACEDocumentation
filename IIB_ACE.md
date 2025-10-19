@@ -1467,7 +1467,7 @@ correct since we created 'csvone', using DFDL.
 
 The graphical map opens up.
 
-![Grapical Map](../images/mapping.png)
+![Grapical Map](images/mapping.png)
 
 The root of the left XML message assembly is Edetails. The Edetails
 [1..1] tells us there is at least one details group. The input XML
