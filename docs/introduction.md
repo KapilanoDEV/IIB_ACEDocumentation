@@ -19,4 +19,4 @@ need MQ but now can install MQ on a separate server and connect
 remotely. IIB (V10) has Salesforce and NoSQL database
 connectivity.
 
-[← Back to Main page](../README.md)
+[← Back to Main page](../IIB_ACE.md)
