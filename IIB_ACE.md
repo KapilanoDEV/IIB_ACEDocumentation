@@ -1,108 +1,16 @@
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+## Table of Contents
 
-- [Enterprise Application Integration](#enterprise-application-integration)
-- [Integration Nodes and servers](#integration-nodes-and-servers)
-- [Message Transformation](#message-transformation)
-- [Transformation using XSL in a message flow](#transformation-using-xsl-in-a-message-flow)
-      - [Source](#source)
-      - [Target](#target)
-- [Message Routing](#message-routing)
-  - [Filter node](#filter-node)
-  - [RouteToLabel node](#routetolabel-node)
-- [Message Enrichment](#message-enrichment)
-- [Protocol conversion (MQ, File, http, SOAP, SMTP, POP3, JMS, SFTP)](#protocol-conversion-mq-file-http-soap-smtp-pop3-jms-sftp)
-- [SOA (Service Oriented Architecture)](#soa-service-oriented-architecture)
-- [Toolkit](#toolkit)
-- [Application vs Integration Project](#application-vs-integration-project)
-- [ESQL native to IIB](#esql-native-to-iib)
-- [MOVE NEXTSIBLING vs CARDINALITY and [i] call in a WHILE loop](#move-nextsibling-vs-cardinality-and-i-call-in-a-while-loop)
-- [The MOVE statement](#the-move-statement)
-- [WHILE versus FOR loop](#while-versus-for-loop)
-- [Converting XMLNSC to JSON](#converting-xmlnsc-to-json)
-- [FileInput & FileOutput nodes](#fileinput--fileoutput-nodes)
-- [Difference between DECLARE varName CHAR FIELDNAME() & DECLARE varName REFERENCE TO](#difference-between-declare-varname-char-fieldname--declare-varname-reference-to)
-- [LEAVE statement](#leave-statement)
-- [ESQL field reference overview](#esql-field-reference-overview)
-- [Local, UDP (AKA External) & shared variables](#local-udp-aka-external--shared-variables)
-- [MQInputNode mode. How your messages will be processed](#mqinputnode-mode-how-your-messages-will-be-processed)
-- [MQOutputNode mode. How your messages will be processed](#mqoutputnode-mode-how-your-messages-will-be-processed)
-- [Scenario full queue MQOutputNode node](#scenario-full-queue-mqoutputnode-node)
-- [MQ Output](#mq-output)
-- [MQ Reply](#mq-reply)
-- [IIB Node Connecting to Database using ODBC pt1](#iib-node-connecting-to-database-using-odbc-pt1)
-- [IIB Node Connecting to Database using ODBC pt2](#iib-node-connecting-to-database-using-odbc-pt2)
-- [Oracle DB ESQL](#oracle-db-esql)
-- [PASSTHRU with EVAL](#passthru-with-eval)
-- [Shared variable and ATOMIC block](#shared-variable-and-atomic-block)
-- [The THE function returns the first element of a list.](#the-the-function-returns-the-first-element-of-a-list)
-- [DATE TIME TRANSFORMATION](#date-time-transformation)
-- [INTERVAL DATATYPE](#interval-datatype)
-- [Transformation Extender](#transformation-extender)
-- [Message Set, Message definition creation](#message-set-message-definition-creation)
-- [Message Set, Message definition creation for XML](#message-set-message-definition-creation-for-xml)
-- [Message modelling](#message-modelling)
-- [Mapping XML from an XSD](#mapping-xml-from-an-xsd)
-- [Mapping XML with multiple records from an XSD](#mapping-xml-with-multiple-records-from-an-xsd)
-- [Web Services](#web-services)
-- [SOAP Gateway mode](#soap-gateway-mode)
-- [Exposing SOAP webservice. WSDL creation](#exposing-soap-webservice-wsdl-creation)
-- [REST](#rest)
-- [HTTPS webservice](#https-webservice)
-- [Java and Java Compute Node](#java-and-java-compute-node)
-- [Connect DB JAVA type 4 driver](#connect-db-java-type-4-driver)
-- [Deciding Between ODBC and JDBC Drivers](#deciding-between-odbc-and-jdbc-drivers)
-- [Design, requirements gathering](#design-requirements-gathering)
-- [MQRFH2 Tree](#mqrfh2-tree)
-- [Publication Node](#publication-node)
-- [Shared vs Static Library.](#shared-vs-static-library)
-- [Compile BAR inline](#compile-bar-inline)
-- [BAR override](#bar-override)
-- [Global Cache](#global-cache)
-- [Opaque Parsing](#opaque-parsing)
-- [JCN code to access a message set](#jcn-code-to-access-a-message-set)
-- [Timeout Notification is controlled by Timeout Control](#timeout-notification-is-controlled-by-timeout-control)
-- [Failure and Catch terminals](#failure-and-catch-terminals)
-- [MQ Failure and Catch](#mq-failure-and-catch)
-- [Try Catch node](#try-catch-node)
-- [Propagation](#propagation)
-- [Event Monitoring](#event-monitoring)
-- [Event Monitoring using node properties](#event-monitoring-using-node-properties)
-- [$ mqsichangeflowmonitoring IIBGURU -e IIBGURU_EX -k EvalEmp -f](#-mqsichangeflowmonitoring-iibguru--e-iibguru_ex--k-evalemp--f)
-- [BIP8071I: Successful command completion.](#bip8071i-successful-command-completion)
-- [$ mqsireportflowmonitoring IIBGURU -e IIBGURU_EX -k EvalEmp -f](#-mqsireportflowmonitoring-iibguru--e-iibguru_ex--k-evalemp--f)
-- [BIP8911I: Monitoring settings for flow 'EVAL.PROC.EvalProc' in](#bip8911i-monitoring-settings-for-flow-evalprocevalproc-in)
-- [Event Monitoring using monitoring profile XML file](#event-monitoring-using-monitoring-profile-xml-file)
-- [Set up HTTPS web service](#set-up-https-web-service)
-- [Validation settings for input type nodes](#validation-settings-for-input-type-nodes)
-- [ASBITSTREAM in ESQL](#asbitstream-in-esql)
-- [Aggregation](#aggregation)
-- [SAP](#sap)
-- [How to use IBM App Connect with SAP (via RFC)](#how-to-use-ibm-app-connect-with-sap-via-rfc)
+- [Introduction](docs/introduction.md)
 
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+  - [Enterprise Application Integration](docs/introduction.md#enterprise-application-integration)
+  - [Message Brokers](docs/introduction.md#message-brokers)
 
-# Enterprise Application Integration
+- [Architecture](docs/architecture.md)
 
-If you have disparate technologies like Java, DB, SAP etc in order to
-integrate in a single secure manner you need EAI
+  - [Integration Patterns](docs/architecture.md#integration-patterns)
+  - [Scalability and Clustering](docs/architecture.md#scalability-and-clustering)
 
-ESB is how to implement the concept of EAI.
-Advantages are message transformation, message routing, message
-enrichment, protocol conversion.
 
-> **Note**
->CastIron (Cloud ESB) + IIB = ACE/ACP (ACP is on the Cloud). 
-
-Upto V9 WMB
-you could run older versions of WMB code and WESB. IBM Integration Bus
-represents the IBM strategic Enterprise Service Bus offering and is the
-successor product for existing clients of both IBM WebSphere Message
-Broker and IBM WebSphere Enterprise Service Bus. From V10 IIB does not
-need MQ but now can install MQ on a separate server and connect
-remotely. IIB (V10) has Salesforce and NoSQL database
-connectivity.
 
 # Integration Nodes and servers
 
