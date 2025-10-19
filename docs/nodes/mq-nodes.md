@@ -14,7 +14,7 @@
 
 # MQInputNode mode. How your messages will be processed
 
-![Message Flow with MQInput node](IIB.fld/MQInputTransactionmode.png)
+![Message Flow with MQInput node](../../IIB.fld/MQInputTransactionmode.png)
 
 [Transaction Mode of MQ Input Node (Part1)](https://youtu.be/QGp83DeRoUs?si=BA8Iz6zAcy9FryfA)
 Under Properties then Advanced there is a Transaction mode which relates to how your messages
@@ -85,7 +85,7 @@ When Transaction mode is Automatic and Default Persistance property on the IN qu
 
 Sometimes the app sending the message to the flow has a Persistent Msg setting:
 
-![MQMD tab in rfhutilc](IIB.fld/rfhutilMQMDsection.png)
+![MQMD tab in rfhutilc](../../IIB.fld/rfhutilMQMDsection.png)
 
 If you select No then it will override the queues "Persistent" setting and the message is lost.
 
@@ -142,7 +142,7 @@ header follows the WebSphere® MQ message descriptor (MQMD) and precedes
 the message body, if present.
 
 What is the use of MQRFH2 header? You can pass application data to
-[other] flows if the protocol is MQ. In the example below
+__other__ flows if the protocol is MQ. In the example below
 the MQ Output puts a message to a queue called test2. That then triggers
 another message flow called SecondFlow.msgflow which has an MQ Input to
 receive the message. You cannot use Environment.Variables.orderPerson
@@ -153,55 +153,48 @@ In the flow below the environmental variable is not available for the
 "call Service" but is accessible from the compute nodes. The 'call
 Service' contains:
 
-SET OutputRoot.XMLNSC.ServiceResponse =
-InputRootXMLNSC.shiporder.shipto;
+```
+SET OutputRoot.XMLNSC.ServiceResponse = InputRootXMLNSC.shiporder.shipto;
+```
 
+In the first flow: 
 
+```
+SET Environment.Variables.orderPerson = InputRoot.XMLNSC.shiporder.orderperson;
+```
 
-In the first flow: SET Environment.Variables.orderPerson =
-InputRoot.XMLNSC.shiporder.orderperson;
+This variable is then needed in the second flow:
 
-[This variable is then needed in the second flow:]
-
-SET OutputRoot.MQRFH2.usr.oPerson =
-Environment.Variables.orderPerson;
+```
+SET OutputRoot.MQRFH2.usr.oPerson = Environment.Variables.orderPerson;
+```
 
 Since the Compute1 node has an Out1 → HTTP Reply and Out → MQ Output
 you need to construct a message for the tree that will go to HTTP Reply
 & a different message tree that goes to MQ Output.
 
-[CALL CopyMessageHeaders();]
+```
+CALL CopyMessageHeaders();
 
-[DELETE FIELD OutputRoot.HTPResponseHeader;]
+DELETE FIELD OutputRoot.HTPResponseHeader;
 
-[SET OutputRoot.XMLNSC.Acknowledgement = 'Sent to Downstream';]
+SET OutputRoot.XMLNSC.Acknowledgement = 'Sent to Downstream';
 
-PROPAGATE TO TERMINAL 'out1'; --this goes to the HTTP Reply which
-sends a response to the client that initiated the HTTP request
-
+PROPAGATE TO TERMINAL 'out1'; --this goes to the HTTP Reply which sends a response to the client that initiated the HTTP request
+```
 (FYI if you added DELETE NONE to the last ESQL it will not delete the
 Message Assembly/Logical Tree after propagating)
 
------------- Second message assembly being constructed from
-scratch again
+------------ Second message assembly being constructed from scratch again
 
-[SET OutputRoot.Properties = InputRoot.Properties;]
+```
+SET OutputRoot.Properties = InputRoot.Properties;
+SET OutputRoot.MQMD = InputRoot.MQMD;
+DELETE FIELD OutputRoot.HTPResponseHeader;
+SET OutputRoot.MQRFH2.usr.oPerson = Environment.Variables.orderPerson;
+SET OutputRoot.MQRFH2.usr.shipto = InputRoot.XMLNSC.ServiceResponse; -- this is the response from 'call Service'. This Input Assembly was object was constructed in the 'call Service'.
 
-[SET OutputRoot.MQMD = InputRoot.MQMD;]
+RETURN TRUE; -- by default means it will propagate to the OUT terminal so no need for an explicit propagate. To stop this default behaviour use RETURN FALSE
+```
 
-[DELETE FIELD OutputRoot.HTPResponseHeader;]
-
-SET OutputRoot.MQRFH2.usr.oPerson =
-Environment.Variables.orderPerson;
-
-SET OutputRoot.MQRFH2.usr.shipto = InputRoot.XMLNSC.ServiceResponse; --
-this is the response from 'call Service'. This Input Assembly was object
-was constructed in the 'call Service'.
-
-RETURN TRUE; -- by default means it will propagate to the OUT terminal
-so no need for an explicit propagate. To stop this default behaviour use
-RETURN FALSE
-
-[Once the 2][^nd^]{.s10} message assembly reaches the
-2[^nd^]{.s10} flow via MQ protocol a new Output message assembly
-is created using the MQRFH2 header values.
+Once the 2nd message assembly reaches the 2nd flow via MQ protocol a new Output message assembly is created using the MQRFH2 header values.
