@@ -1,3 +1,12 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Enterprise Application Integration](#enterprise-application-integration)
+- [Design, requirements gathering](#design-requirements-gathering)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Enterprise Application Integration
 
 If you have disparate technologies like Java, DB, SAP etc in order to
@@ -18,5 +27,11 @@ Broker and IBM WebSphere Enterprise Service Bus. From V10 IIB does not
 need MQ but now can install MQ on a separate server and connect
 remotely. IIB (V10) has Salesforce and NoSQL database
 connectivity.
+
+# Design, requirements gathering
+
+What questions will you ask? How will you implement these? For example,
+if you want to expose a web service what kind of notes will you
+take?
 
 [← Back to Main page](../IIB_ACE.md)

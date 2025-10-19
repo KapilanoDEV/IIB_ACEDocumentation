@@ -1,3 +1,13 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Integration Nodes and servers](#integration-nodes-and-servers)
+- [MQ dependency](#mq-dependency)
+- [Application vs Integration Project](#application-vs-integration-project)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Integration Nodes and servers
 
 There is no option to create the node from the toolkit. You can run
@@ -106,5 +116,17 @@ Debugger. For example, set this property to 9997.
       JVM:
         jvmDebugPort: 9997
 ```
+
+# MQ dependency
+
+IIB only needs MQ if you are using MQ nodes. Before IIB v9 it was
+called WMB where MQ is a prerequisite. The QMGR contains Integration
+Node configuration. IIB v10 MQ is not a prerequisite.
+
+# Application vs Integration Project
+
+Both are a Container, but the Application provide isolation since you
+can use the resources it contains. This is needed for Microservices
+where the MS is contained.
 
 [← Back to Main page](../IIB_ACE.md)
