@@ -100,3 +100,4 @@ MonitoringProfile.xsd, which you can find in the samples directory of
 your IBM® App Connect Enterprise installation:
 Install_root/server/sample/Monitoring/MonitoringProfile.xsd
 
+[← Back to Main page](../IIB_ACE.md)

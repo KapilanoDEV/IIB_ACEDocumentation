@@ -60,3 +60,5 @@ mqsichangeproperties IIBGURU -e IIBGURU_EX -o ComIbmJVMManager -n keystoreType -
 mqsichangeproperties IIBGURU -e IIBGURU_EX -o ComIbmJVMManager -n keystorePass -v defaultKeystore::password
 mqsisetdbparms IIBGURU -n defaultKeystore::password -u ignore -p G8n35hj1
 mqsireload IIBGURU -e IIBGURU_EX
+
+[← Back to Main page](../IIB_ACE.md)

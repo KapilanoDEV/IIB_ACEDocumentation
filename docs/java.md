@@ -30,7 +30,7 @@ method BIP4157E: The user-defined node 'Java Compute' could not be
 deployed. Details: java.lang.UnsupportedClassVersionError: JVMCFRE003
 bad major version class=Java18Test, offset=6.
 
-![JCN Wizard](images/JCNWizard.png)
+![JCN Wizard](../images/JCNWizard.png)
 
 MbJavaComputeNode is the superclass of all the classes used in JCN.
 
@@ -121,4 +121,4 @@ using XPath.
 |----------|
 | [ ] |
 
-[\*\* \*\*]
+[← Back to Main page](../IIB_ACE.md)

@@ -48,3 +48,5 @@ full list of failures encountered. This property is affected by the
 Parse Timing property; when partial parsing is selected the current
 parsing operation parses only a portion of an input message, so only the
 validation failures in that portion of the message are reported.
+
+[← Back to Main page](../IIB_ACE.md)

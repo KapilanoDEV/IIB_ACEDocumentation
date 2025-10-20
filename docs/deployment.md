@@ -21,7 +21,6 @@ can be accessed by multiple .msgflow files. If any of the flows that you
 add to your BAR file contain a subflow that is defined in a .msgflow
 file, you must select Compile and in-line resources.
 
-[ ]
 
 # BAR override
 
@@ -77,4 +76,4 @@ properties.
 $> mqsideploy BROKERNAME -e EG_NAME -a \<path to
 desktop>/MAP_PRO.generated.bar
 
-[ ]
+[← Back to Main page](../IIB_ACE.md)
