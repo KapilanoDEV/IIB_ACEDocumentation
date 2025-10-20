@@ -168,7 +168,7 @@ each part means.
 A message set can contain 1 or more message definitions. A message set
 has a unique ID.
 
-![Message Set](IIB.fld/image004.png)
+![Message Set](../IIB.fld/image004.png)
 
 The message definition defines the field names, data types, delimiters.
 This definition helps with say a message transformation. Consider the
@@ -195,7 +195,7 @@ given a name and the name added to Types. Add it as a Complex type. In
 order to tell IIB that ERECORD is a composite of the 3 fields right
 click on ERECORD then Add Element Reference.
 
-![Complex type](IIB.fld/image005.png)
+![Complex type](../IIB.fld/image005.png)
 
 You need to go to Properties of ERECORD then select all elements
 delimited then add colon for delimiter. When you test this using
@@ -261,7 +261,7 @@ If your incoming data contains a header and a trailer, then use
 record-oriented text and select 'The first record is a header' in the
 wizard.
 
-![Message Model](IIB.fld/MessModWiz.png)
+![Message Model](../IIB.fld/MessModWiz.png)
 
 [JAN212021-IIB ModellingPt2&Mapping 12 minutes](https://drive.google.com/file/d/1ESpoPURJo-q4rYdCjFCHWRGS9_VoTbJ8/view?usp=share_link). We saw the
 transformations with ESQL and the JCN. If you don't want to write a
@@ -310,7 +310,7 @@ correct since we created 'csvone', using DFDL.
 
 The graphical map opens up.
 
-![Grapical Map](images/mapping.png)
+![Grapical Map](../images/mapping.png)
 
 The root of the left XML message assembly is Edetails. The Edetails
 [1..1] tells us there is at least one details group. The input XML
