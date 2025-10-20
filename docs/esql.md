@@ -33,8 +33,9 @@ next transaction starts the shared variable is available.
 
 # Shared vs Static Library.
 
-30DEC2020-IIB RoutingTryCatchTrace 17 minutes. What is the difference
-between a Static and Shared library in IBM Integration Bus? Libraries
+[DEC302020-IIB RoutingTryCatchTrace 17 minutes](https://drive.google.com/file/d/1OtA5Kyv5lCXJLzgyIIjcrndxdXGaKBOM/view?usp=share_link)
+
+What is the difference between a Static and Shared library in IBM Integration Bus? Libraries
 can't include message flows only subflows. The subflows could take care
 of say error handling. This is common to many applications. If you
 deploy an application that references a shared library you see this
@@ -43,24 +44,19 @@ shared library that has not been deployed to the Integration Server
 (drag and drop to the Integration Server). But a static library will not
 complain since it is included in the deployed application.
 
-[·]{.s11}[       ]{.s12}A. Shared libraries may include additional jar
-files while Static libraries cannot.
+A. Shared libraries may include additional jar files while Static libraries cannot.
 
-[·]{.s11}[       ]{.s12}B. Shared libraries can be deployed to an
+B. Shared libraries can be deployed to an
 Integration Server while Static libraries cannot.
 
-[·]{.s11}[       ]{.s12}C. Shared libraries encapsulate common code
-that may be used by multiple applications while Static libraries do
-not.
+C. Shared libraries encapsulate common code
+that may be used by multiple applications while Static libraries do not.
 
-[·]{.s11}[       ]{.s12}D. Multiple applications can reference the same
-Shared library without having to include the library as part of the
+D. Multiple applications can reference the same Shared library without having to include the library as part of the
 build as in the case of Static library.
 
-[·]{.s11}[       ]{.s12}E. Static library appears under Included
+E. Static library appears under Included
 Libraries folder. Shared libraries appear under Referenced folder.
-
-[ ]
 
 # ESQL native to IIB
 
@@ -136,7 +132,7 @@ both read from and write to.
 ..with subscript code, where in order to find the [n+1]'th entry when
 using indices, Broker must navigate to [1], [2], [3],....[n]
 and then to [n+1]. Using subscripts is regarded as a performance no
-no. Imagine you had 10,000 Order. This would result in each and every
+no. Imagine you had 10,000 Orders. This would result in each and every
 iteration of the loop walking down the tree over the InputRoot, MRM,
 ns:Data Nodes and then across the .ns:Order until it found the id and
 ns:Row.sRow sibling nodes. This means by the time we get round to
@@ -213,7 +209,7 @@ SET OutputRoot.JSON.Data = InputRoot.XMLNSC;
 This will only work if you are not sending multiple arrays of elements
 in your XML.
 
-![multiple arrays of elements](IIB.fld/ac126101.gif)
+![multiple arrays of elements](../IIB.fld/ac126101.gif)
 
 The same applies to JSON to XML. Your output root will not
 have well formatted message trees. That means the nodes that are
@@ -454,7 +450,7 @@ go to the database each time.
 > Ref:
 [Efficient Caching](https://www.websphereusergroup.co.uk/wug/presentations/38/EfficientCaching\_-V2.pptx.pdf)
 
-![Screenshot from Youtube vid](IIB.fld/SharedVar_Main.png)
+![Screenshot from Youtube vid](../IIB.fld/SharedVar_Main.png)
 
 Whatever is stored in a shared variable is held in cache memory until
 we refresh the execution group, application or application flow using
@@ -527,9 +523,7 @@ variables which use cache.
 
 # Global Cache
 
-[One of the most important interview questions. Udemy 17]
-
-[ ]
+One of the most important interview questions. [Udemy 17](https://www.udemy.com/course/ibm-integration-bus-with-practicals/learn/lecture/20708558#overview)
 
 Shared variables used to store a temporary variable in Cache available
 to all message flows in the same broker schema.
@@ -540,46 +534,30 @@ Shared variables will not help you.
 Global Cache allows you to share variables across schemas AND execution
 groups or Integration node (broker).
 
-[ ]
+```
+mqsireportproperties IIBGURU -b cachemanager -o CacheManager -r
 
-[mqsireportproperties IIBGURU -b cachemanager -o CacheManager -r]
+CacheManager
+  uuid='CacheManager'
+  policy='disabled'
+  portRange='2840-2859'
+  listenerHost=''
+  shutdownMode='fast'
+  objectGridCustomFile=''
+  deploymentPolicyCustomFile=''
 
-[ ]
+BIP8071I: Successful command completion.
+```
 
-[CacheManager]
-
-[  uuid='CacheManager']
-
-[  policy='disabled']
-
-[  portRange='2840-2859']
-
-[  listenerHost='']
-
-[  shutdownMode='fast']
-
-[  objectGridCustomFile='']
-
-[  deploymentPolicyCustomFile='']
-
-[ ]
-
-[BIP8071I: Successful command completion.]
-
-mqsichangeproperties IIBGURU -b cachemanager -o CacheManager -n
-policy,portRange,listenerHost -v default,generate,localhost
-
-[ ]
+```
+mqsichangeproperties IIBGURU -b cachemanager -o CacheManager -n policy,portRange,listenerHost -v default,generate,localhost
+```
 
 This command will only allow variables to be shared within the
 Integration node (broker) only.
 
-[ ]
-
 Two concepts you need to be aware of. Catalog server and container
 server.
-
-[ ]
 
 Suppose I deploy an application in the default Integration server (EG)
 that will LOAD a variable in Global Cache.
@@ -595,40 +573,27 @@ Global Cache held on the primary EG namely default. If you have 2
 Integration Servers acting as catalog servers then you have some form of
 high availability
 
-[ ]
-
 If I run 'mqsireload default' then the values present in my Global
 Cache will be gone because the Global Cache will be reloaded.
 
-[This will also happen if I restart the broker.]
+This will also happen if I restart the broker.
 
-[ ]
-
-[Enabling Global Cache for multiple Integration Nodes (brokers)]
-
-[----------------------------------------]
+Enabling Global Cache for multiple Integration Nodes (brokers)
+----------------------------------------
 
 You need a policy.xml file that will contain the names of the nodes.
 There are some samples under
 ~/iib-10.0.0.22/server/sample/globalcache.
 
-[ ]
+You have to run the command for all brokers.
 
-[You have to run the command for all brokers.]
+```
+mqsichangebroker BROKER1 -b <PATH>/policy_two_brokers.xml
+mqsichangebroker BROKER2 -b <PATH>/policy_two_brokers.xml
 
-[ ]
-
-[mqsichangebroker BROKER1 -b \<PATH>/policy_two_brokers.xml]
-
-[mqsichangebroker BROKER2 -b \<PATH>/policy_two_brokers.xml]
-
-[ ]
-
-[mqsichangebroker BROKER2 -b disabled //This will switch it off]
-
-[ ]
-
-[----------------------------------------]
+mqsichangebroker BROKER2 -b disabled //This will switch it off
+```
+----------------------------------------
 
 A static method means that it can be accessed without creating an
 object of the class, unlike public
@@ -639,104 +604,77 @@ need an ESQL code to invoke some JAVA code.
 mqbrkruser@SATELLITE-L50D-B:~$ cat
 IBM/IIBT10/workspace/GlobalCacheApp/LoadGlobalCache/SubFlow/LoadGlobalCache_LoadCache.esql
 
-[BROKER SCHEMA LoadGlobalCache.SubFlow]
+```
+BROKER SCHEMA LoadGlobalCache.SubFlow
 
-[CREATE COMPUTE MODULE LoadGlobalCache_LoadCache]
+CREATE COMPUTE MODULE LoadGlobalCache_LoadCache
+CREATE FUNCTION Main() RETURNS BOOLEAN
+  BEGIN
 
-[]CREATE FUNCTION Main() RETURNS BOOLEAN
-
-[]BEGIN
-
-[DECLARE InBlob BLOB;]
-
-SET InBlob = ASBITSTREAM(InputRoot.XMLNSC,
+   DECLARE InBlob BLOB;
+   SET InBlob = ASBITSTREAM(InputRoot.XMLNSC,
 InputRoot.Properties.Encoding, InputRoot.Properties.CodedCharSetId); --
 Converts XML to BLOB so that it can be added to the Global Cache
 
-[CALL LoadXMLToCache('GBKey', InBlob);]
+   CALL LoadXMLToCache('GBKey', InBlob);
+   SET OutputRoot.XMLNSC.Message.Value='Successfully Loaded';
+   RETURN TRUE;
+  
+  END;
 
-[SET OutputRoot.XMLNSC.Message.Value='Successfully Loaded';]
+CREATE PROCEDURE LoadXMLToCache (IN key CHARACTER, IN Value BLOB)
 
-[RETURN TRUE;]
+ LANGUAGE JAVA
+ EXTERNAL NAME "GlobalCacheClass.LoadXMLToCache";
 
-[]END;
-
-[]CREATE PROCEDURE LoadXMLToCache (IN key CHARACTER, IN Value BLOB
-)
-
-[]LANGUAGE JAVA
-
-[]EXTERNAL NAME "GlobalCacheClass.LoadXMLToCache";
-
-[END MODULE;]
-
+END MODULE;
+```
 mqbrkruser@SATELLITE-L50D-B:~$ cat
 IBM/IIBT10/workspace/GlobalCache_PRJ/src/GlobalCacheClass.java
 
-[import com.ibm.broker.plugin.MbException;]
+```
+import com.ibm.broker.plugin.MbException;
+import com.ibm.broker.plugin.MbGlobalMap;
 
-[import com.ibm.broker.plugin.MbGlobalMap;]
+public class GlobalCacheClass {
 
-[public class GlobalCacheClass {]
+  public static String MapName = "GBMAP";
+  public static void LoadXMLToCache(String key, byte[] xml) {
 
-[public static String MapName = "GBMAP";]
-
-public static void LoadXMLToCache(String key, byte[] xml) {
-
-[try {]
+    try {
 
 // getGlobalMap is a static method. Static methods can be called
-without creating objects MbGlobalMap map =
-MbGlobalMap.getGlobalMap(MapName);
+without creating objects
+      MbGlobalMap map = MbGlobalMap.getGlobalMap(MapName);
+        if(map.containsKey(key)){
+          map.update(key, xml);
+        }
+        else {
+          map.put(key, xml);
+        }
 
-[]if(map.containsKey(key)){
-
-[ map.update(key, xml);]
-
-[}]
-
-[else {]
-
-[map.put(key, xml);]
-
-[}]
-
-[} catch (MbException e) {]
-
-[e.printStackTrace();]
-
-[}]
-
-[}]
+    } catch (MbException e){
+      e.printStackTrace();
+    }
+}
 
 public static byte[] GetCacheValue(String key) {
+  byte[] xml = null;
+  try {
+    MbGlobalMap map = MbGlobalMap.getGlobalMap(MapName);
+    xml = (byte[])map.get(key);
+  } catch (MbException e) {
+  // TODO Auto-generated catch block
+      e.printStackTrace();
+  }
+  return xml;
+  }
 
-byte[] xml = null;
-
-[try {]
-
-[MbGlobalMap map = MbGlobalMap.getGlobalMap(MapName);]
-
-xml = (byte[])map.get(key);
-
-[} catch (MbException e) {]
-
-[// TODO Auto-generated catch block]
-
-[e.printStackTrace();]
-
-[}]
-
-[return xml;]
-
-[}]
-
-[}]
-
+}
+```
 You can see the Global Cache in the Activity log, within the Web
-interface. Udemy 19
-
-[\*\* \*\*]
+interface.
+[Udemy 19](https://www.udemy.com/course/ibm-integration-bus-with-practicals/learn/lecture/20708636#overview)
 
 # The THE function returns the first element of a list.
 
@@ -834,8 +772,7 @@ BLOB is a string of hexadecimal characters. The benefit is that you can
 insert the payload into a database. Another reason is that you may want
 to cast an XML or JSON into a string.
 
-[ ]
-
+```
 SET InBlob = ASBITSTREAM(InputRoot.XMLNSC,
 InputRoot.Properties.Encoding, InputRoot.Properties.CodedCharSetId); --
 Converts XML to BLOB so that it can be added to the Global Cache
@@ -846,6 +783,7 @@ SET XMLInput = COALESCE( CAST(ASBITSTREAM(InputRoot.XMLNSC CCSID 1208)
 as CHAR CCSID 1208), ''); SET JSONInput = COALESCE(
 CAST(ASBITSTREAM(InputRoot.JSON.Data CCSID 1208) as CHAR CCSID 1208),
 '');
+```
 
 Every language has a particular encoding that the operating system can
 understand. CCSID defines the characters that are allowed (1208 =
@@ -854,72 +792,53 @@ to a BLOB if your message is using English characters. However if the
 message contains something unusual like some Cyrillic characters then
 without CCSID it won't know how to handle the characters.
 
-[]https://youtu.be/bKVmhaRqsCg?si=RB3ppXk\_-MWnaoMy Encoding 273
+[Encodings and Endianness](https://youtu.be/bKVmhaRqsCg?si=RB3ppXk\_-MWnaoMy) Encoding 273
 corresponds to Unix (Non-Intel) operating systems, for example AIX or
 Solaris Spark, this is referred to as Big Endian. Encoding 546
 corresponds to Linux and Windows operating systems on Intel, this is
 referred to as Little Endian.
 
-[ ]
-
 # Aggregation
 
-[\*\* \*\*]
 
-[https://iteritory.com/ibm-integration-bus-iib-aggregate-nodes-sample-with-http-web-services/[]{.s15}](https://iteritory.com/ibm-integration-bus-iib-aggregate-nodes-sample-with-http-web-services/)
+[IIB Aggregate nodes sample with HTTP web services](https://iteritory.com/ibm-integration-bus-iib-aggregate-nodes-sample-with-http-web-services/)
 
 The following JSON message is sent to the REST API
 /aggregationcustomerapi/v1/customers/.
 
-[\*\* \*\*]
+```
+{
+  "CustomerInfoReq": [
+    {
+      "custId": "Amit"
+    },
+    {
+      "custId": "Shreya"
+    },
+    {
+      "custId": "Pete"
+    }
+  ]
+}
+```
 
-*{\
-"CustomerInfoReq": \
-{\
-"custId": "Amit"\
-},\
-{\
-"custId": "Shreya"\
-},  \
-{\
-"custId": "Pete"\
-}\
-\
-}*
+The request is sent to a sub flow.
 
-[\* \*]
+```
+SET OutputLocalEnvironment.Destination.HTTP.RequestURL = reqURL || myref.Item[I].custId;
+  PROPAGATE TO TERMINAL 'out' DELETE NONE;
+  SET I = I + 1;
 
-[\* \*]
+END WHILE;
+RETURN FALSE;
 
-[ ]
-
-[The request is sent to a sub flow.]
-
-[ ]
-
-
-
-SET OutputLocalEnvironment.Destination.HTTP.RequestURL = reqURL ||
-myref.Item[I].custId;
-
-[                  PROPAGATE TO TERMINAL 'out' DELETE NONE;]
-
-[                  SET I = I + 1;]
-
-[          END WHILE;]
-
-[          RETURN FALSE;]
-
-[   END;]
-
-[ ]
+END;
+```
 
 Within the Split compute node, the SET initializes the output
 buffer.
 
-![](IIB.fld/image009.png){style="width: 500px;height: 150px;"}
-
-[ ]
+![Message Flow](../IIB.fld/image009.png)
 
 By default, the node clears the output message buffer and reclaims the
 memory when the PROPAGATE statement completes. The PROPAGATE ... DELETE
@@ -929,20 +848,16 @@ Use DELETE NONE if you want the downstream nodes to be able to see a
 single instance of output local environment message, and exception list
 trees.
 
-[ ]
-
 Propagation is a synchronous process. That is, the next statement
 (incrementing the counter in our example) is not executed until all the
 processing of the message in downstream nodes has completed. So that
 means the counter 'I' will be incremented after the
-[[http://localhost:7080/legacybackendservice/v1/customer/Amit]](http://localhost:7080/legacybackendservice/v1/customer/Amit)
+http://localhost:7080/legacybackendservice/v1/customer/Amit
 web service response is sent to the AggregateReply.
 
 After the while loop completes the return false command is run. This
 exits the code immediately. Only now will the flow pass on to the
 AggregateReply node.
-
-[ ]
 
 The AggregateReply node creates a folder in the combined message tree
 below Root, called ComIbmAggregateReplyBody. Below this folder, the node
@@ -950,36 +865,24 @@ creates a number of subfolders using the names that you set in the
 AggregateRequest nodes. These subfolders are populated with all
 associated reply messages.
 
-[ ]
-
-
-
-![](IIB.fld/image010.png){style="width: 500px;height: 500px;"}
+![Payload](../IIB.fld/image010.png)
 
 AggregateControl, AggregateRequest nodes (Used in Fan-Out to broadcast
 the request message to multiple destinations). The request node records
 the number of requests.
 
-[ ]
-
 AggregateReply (Used in Fan-In to collect responses) -- checks if all
 responses are collected.
-
-[ ]
 
 'Aggregate Name' property of AggregateControl & AggregateReply nodes
 should be the same. Our Aggregate Control & AggregateReply nodes have an
 Aggregate name AGGR.
 
-[https://ibmintegrationbus.wordpress.com/2019/06/14/aggregation-nodes/[]{.s15}](https://ibmintegrationbus.wordpress.com/2019/06/14/aggregation-nodes/)
-
-[ ]
+[https://ibmintegrationbus.wordpress.com/2019/06/14/aggregation-nodes/](https://ibmintegrationbus.wordpress.com/2019/06/14/aggregation-nodes/)
 
 The 'Folder Name' property of the AggregateRequest node decide how the
 input will be structured in Fan-Out flow. We are using RESP. RESP will
 be an array for multiple responses.
-
-[ ]
 
 It combines the generation and concurrent fan-out of a number of
 related requests with the fan-in of the corresponding replies, and
@@ -987,17 +890,13 @@ compiles those replies into a single aggregated reply message. IIB as a
 product makes it easy to implement complex integration scenario with
 Aggregation support.
 
-[ ]
-
 FanOut flows: AggregateRequest and AggregateControl (whenever we use
 Aggregation control, we must use Aggregation request)
 
 FanIn flow: AggregateReply (it will club the incoming multiple
 responses) from AggregateControl node and AggregateRequest node.
 
-[ ]
-
 Reference:
-[[https://community.ibm.com/community/user/integration/viewdocument/ibm-integration-bus-for-developers?CommunityKey=77544459-9fda-40da-ae0b-fc8c76f0ce18&tab=librarydocuments]{.s17}](https://community.ibm.com/community/user/integration/viewdocument/ibm-integration-bus-for-developers?CommunityKey=77544459-9fda-40da-ae0b-fc8c76f0ce18&tab=librarydocuments){.s16}
+[https://community.ibm.com/community/user/integration/viewdocument/ibm-integration-bus-for-developers?CommunityKey=77544459-9fda-40da-ae0b-fc8c76f0ce18&tab=librarydocuments](https://community.ibm.com/community/user/integration/viewdocument/ibm-integration-bus-for-developers?CommunityKey=77544459-9fda-40da-ae0b-fc8c76f0ce18&tab=librarydocuments)
 
 [← Back to Main page](../IIB_ACE.md)

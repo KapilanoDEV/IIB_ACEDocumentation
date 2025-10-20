@@ -196,4 +196,4 @@ RETURN TRUE; -- by default means it will propagate to the OUT terminal so no nee
 
 Once the 2nd message assembly reaches the 2nd flow via MQ protocol a new Output message assembly is created using the MQRFH2 header values.
 
-[← Back to Main page](../IIB_ACE.md)
+[← Back to Main page](../../IIB_ACE.md)
