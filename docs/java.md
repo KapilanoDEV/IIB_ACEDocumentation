@@ -80,45 +80,20 @@ The logical tree consists of 4 trees:
 1. Environment
 1. ExceptionList
 
-![Message tree in debug](IIB.fld/Variables.png)
-![How java code traverse tree](images/ac30330a.gif)
-![How code relates to tree](IIB.fld/javaCNtree.png)
+![Message tree in debug](../IIB.fld/Variables.png)
+![How java code traverse tree](../images/ac30330a.gif)
+![How code relates to tree](../IIB.fld/javaCNtree.png)
 
 # JCN code to access a message set
 
-In google drive "[2021-01-27] IIBFixJCNMulti.mp4" you can access MSET
-using XPath.
+In google drive [JAN272021-IIBFixJCNMulti](https://drive.google.com/file/d/10mXtpIUF0NFsFR5wdvtVSPUCLfqGC3tW/view?usp=share_link) you can access MSET using XPath.
 
-| |
-|----|
-| [MbElement root = inAssembly.getMessage().getRootElement().getLastChild().getLastChild();] |
-
-| |
-|---------------------------------------------------------------|
-| MbElement emp1[]= root.getAllElementsByPath("\*"); |
-
-| |
-|-----------------------|
-| [              ] |
-
-| |
-|----|
-| [MbElement Root=outAssembly.getMessage().getRootElement().getFirstChild();] |
-
-| |
-|----|
-| [Root.getFirstElementByPath("./MessageSet").setValue("JCN_CSV_MessageSet");] |
-
-| |
-|----|
-| [Root.getFirstElementByPath("./MessageType").setValue("{}:SDET");] |
-
-| |
-|----|
-| [Root.getFirstElementByPath("./MessageFormat").setValue("Text_CSV");] |
-
-| |
-|----------|
-| [ ] |
+```
+MbElement root = inAssembly.getMessage().getRootElement().getLastChild().getLastChild();MbElement emp1[]= root.getAllElementsByPath("\*");
+MbElement Root=outAssembly.getMessage().getRootElement().getFirstChild();
+Root.getFirstElementByPath("./MessageSet").setValue("JCN_CSV_MessageSet");
+Root.getFirstElementByPath("./MessageType").setValue("{}:SDET");
+Root.getFirstElementByPath("./MessageFormat").setValue("Text_CSV");
+```
 
 [← Back to Main page](../IIB_ACE.md)
