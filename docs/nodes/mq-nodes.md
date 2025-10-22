@@ -172,9 +172,10 @@ SET OutputLocalEnvironment.Destination.MQ.DestinationData[2].queueName='OUT1';
 
 # MQ Reply
 
-[JAN042021-IIBFileNodeBARMQReplyTryCatchFlowOrder](https://drive.google.com/file/d/15EypxxgHztb_VdEnJa82vgmFoQO7wY7L/view?usp=share_link) 24 minutes. The client
-system sets the name of the queue the flow has to reply to. RFHUTIL
-allows you to set the ReplyTo header setting.
+[JAN042021-IIBFileNodeBARMQReplyTryCatchFlowOrder](https://drive.google.com/file/d/15EypxxgHztb_VdEnJa82vgmFoQO7wY7L/view?usp=share_link) 24 minutes. 
+
+The MQ Reply node and the MQ Output nodes both PUT messages on a queue. Whereas the queue for the latter is defined at
+the IIB layer, for the latter the client system sets the name of the queue the flow has to reply to in the HEADER. RFHUTIL allows you to set the ReplyToQ header setting.
 
 # Publication Node
 
