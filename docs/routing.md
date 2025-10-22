@@ -3,8 +3,9 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Message Routing](#message-routing)
-  - [Filter node](#filter-node)
-  - [RouteToLabel node](#routetolabel-node)
+- [Route node](#route-node)
+- [Filter node](#filter-node)
+- [RouteToLabel node](#routetolabel-node)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -20,13 +21,17 @@ Postman request you can set the content type to XML or JSON. Then the
 XPath dictates which node to propagate to. It might send the message to
 the RCD where the domain is set.
 
-## Filter node
+# Route node
+
+The Route node does not support ESQL. The Filter, Compute and Database nodes do.
+
+# Filter node
 
 Use the Filter node with an ESQL statement to determine the next node
 to which the message is sent by this node. Do not use the ESQL code that
 you develop for use in a Filter node in any other type of node.
 
-## RouteToLabel node
+# RouteToLabel node
 
 Use the RouteToLabel node after a Compute node or a JavaCompute node
 for complex routing. Define a list of destinations in a Compute or
