@@ -9,12 +9,19 @@
 - [The MOVE statement](#the-move-statement)
 - [WHILE versus FOR loop](#while-versus-for-loop)
 - [Converting XMLNSC to JSON](#converting-xmlnsc-to-json)
+- [Propagation vs RETURN](#propagation-vs-return)
+  - [PROPAGATE](#propagate)
+    - [Key Behaviors:](#key-behaviors)
+  - [RETURN](#return)
+    - [Key Behaviors:](#key-behaviors-1)
+  - [PROPAGATE vs RETURN TRUE vs RETURN FALSE in IBM ESQL](#propagate-vs-return-true-vs-return-false-in-ibm-esql)
 - [Difference between DECLARE varName CHAR FIELDNAME() & DECLARE varName REFERENCE TO](#difference-between-declare-varname-char-fieldname--declare-varname-reference-to)
 - [LEAVE statement](#leave-statement)
 - [COALESCE](#coalesce)
 - [ESQL field reference overview](#esql-field-reference-overview)
 - [Shared variable and ATOMIC block](#shared-variable-and-atomic-block)
 - [Global Cache](#global-cache)
+  - [Enabling Global Cache for multiple Integration Nodes (brokers)](#enabling-global-cache-for-multiple-integration-nodes-brokers)
 - [The THE function returns the first element of a list.](#the-the-function-returns-the-first-element-of-a-list)
 - [DATE TIME TRANSFORMATION](#date-time-transformation)
 - [INTERVAL DATATYPE](#interval-datatype)
@@ -99,9 +106,8 @@ END MODULE;
 ```
 
 CARDINALITY returns the number of elements in a list; here the
-correlation InputRoot is pointing to the message tree which contains the
-Properties, MQMD and XMLNSC so CARDINALITY is 3. InputRoot is a field
-reference with a [] array indicator.
+correlation InputRoot is pointing to the message tree which contains the Properties, MQMD and XMLNSC so CARDINALITY is 3. In ESQL, array indexing starts at 1, meaning the first array element is accessed with an index of 1. This understanding is essential for accurately working with arrays in your ESQL programming.
+InputRoot is a field reference with a [] array indicator.
 
 InputRoot.\*[] allows you to refer to the array of all children of
 the root element using a path element of \*.
@@ -215,6 +221,78 @@ The same applies to JSON to XML. Your output root will not
 have well formatted message trees. That means the nodes that are
 downstream will fail while formatting the data
 [JAN042021-IIBFileNodeBARMQReplyTryCatchFlowOrder](https://drive.google.com/file/d/15EypxxgHztb_VdEnJa82vgmFoQO7wY7L/view?usp=share_link)
+
+# Propagation vs RETURN
+
+Both PROPAGATE and RETURN are used inside Compute, Filter, or Database nodes in ESQL to control how messages move through a flow.
+But they serve very different purposes:
+- PROPAGATE controls when and where messages are sent downstream.
+- RETURN controls when the ESQL processing ends.
+
+## PROPAGATE
+>* Purpose:
+PROPAGATE explicitly sends a message to the next node in the flow, possibly multiple times, and allows you to control what gets propagated.
+
+### Key Behaviors:
+- You can use it multiple times in one Compute node.
+- You can send different copies of the message tree downstream.
+- It does not end the ESQL module — execution continues after it (unless you explicitly call RETURN).
+- You can use it for splitting messages or dynamic routing.
+```
+-- Send message to the Out terminal
+PROPAGATE TO TERMINAL 'out';
+
+-- Send a copy to an alternate terminal
+PROPAGATE TO TERMINAL 'alternate';
+
+RETURN FALSE;
+```
+
+## RETURN
+>* Purpose
+RETURN ends the current ESQL procedure or function.
+It does not send any message by itself — it simply stops execution.
+
+### Key Behaviors:
+- Used to exit from the ESQL routine.
+- When returning FALSE, it can suppress propagation to the next node.
+- RETURN is implicit if your ESQL module ends without one (IIB assumes RETURN TRUE;).
+- RETURN TRUE; -- Think of it as returning a value to the node itself. If the value is TRUE then in a Compute node the message is propagated to the Out terminal (in the default case).
+- RETURN FALSE; -- Stop running the code. The node does not propagate the message to any of the downstream terminals on the node. The message reaches the "end" of the flow. Control is returned to the previous node to the current one, and then to the previous one to that one and so on until the original input node is reached. However, if there was (for example) a FlowOrder node before the compute node that returned FALSE and the Compute node was wired to the "First" terminal, then control will pass to the FlowOrder "Second" terminal as you would expect. Eventually the flow will unwind until control reaches the Input node, but the Input node will NOT try to propagate the same message again. As far as the Input node is concerned the Flow finshed normally, without error.
+
+```
+IF InputRoot.XMLNSC.Order.Priority = 'HIGH' THEN
+  PROPAGATE TO TERMINAL 'HighPriority';
+  RETURN FALSE; -- stop further propagation
+END IF;
+```
+## PROPAGATE vs RETURN TRUE vs RETURN FALSE in IBM ESQL
+
+| Feature | **PROPAGATE** | **RETURN TRUE** | **RETURN FALSE** |
+|----------|----------------|-----------------|------------------|
+| **Purpose** | Explicitly sends a message downstream | Ends ESQL routine and allows default propagation | Ends ESQL routine and *prevents* default propagation |
+| **Sends a message?** | ✅ Yes (immediate) | ❌ No (implicit default send after routine ends) | ❌ No (stops all propagation) |
+| **Stops execution?** | ❌ No (continues after PROPAGATE) | ✅ Yes | ✅ Yes |
+| **Default propagation** | Can suppress it with `DELETE DEFAULT` | ✅ Yes — message sent once automatically | ❌ No — message not sent automatically |
+| **Multiple calls allowed?** | ✅ Yes | ❌ No (routine exits) | ❌ No (routine exits) |
+| **Typical use case** | Send one or many messages manually | Normal exit from Compute node (default behavior) | Conditional early exit to stop message flow |
+| **Used in** | Compute, Filter, Database nodes | Any ESQL routine | Any ESQL routine |
+| **Analogy** | “Send this message now.” | “I’m done — send message once.” | “I’m done — don’t send anything.” |
+
+
+
+Example usage of both:
+```
+-- Loop over repeating elements and propagate each one
+DECLARE I INTEGER 1;
+WHILE I <= CARDINALITY(InputRoot.XMLNSC.Orders.Order[]) DO
+  SET OutputRoot.XMLNSC.Order = InputRoot.XMLNSC.Orders.Order[I];
+  PROPAGATE;
+  SET I = I + 1;
+END WHILE;
+
+RETURN FALSE;  -- prevent default propagation
+```
 
 # Difference between DECLARE varName CHAR FIELDNAME() & DECLARE varName REFERENCE TO
 
@@ -383,7 +461,7 @@ specified type, name, and value.
 
 ```
 DECLARE outref REFERENCE TO OutputRoot.JSON.Data;
- CREATE FIELD outref.Purchases IDENTITY (JSON.Array)Purchases;
+ CREATE FIELD outref.Purchases IDENTITY (JSON.Array)Purchases; -- creates a JSON Array object for the "Purchases" element.
 SET outref.Purchases.Item[1].Description = inRef.Description;
 
 -- This creates JSON message under the Data element owned by
