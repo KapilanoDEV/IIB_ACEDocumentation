@@ -31,6 +31,7 @@
 
   - [FileInput & FileOutput nodes](docs/nodes/file-nodes.md#fileinput--fileoutput-nodes)
   - [MQEndPoint Policy](docs/nodes/mq-nodes.md#mqendpoint-policy)
+  - [Alternative to MQEndPoint Policy](docs/nodes/mq-nodes.md#alternative-to-mqendpoint-policy)
   - [MQInputNode mode. How your messages will be processed](docs/nodes/mq-nodes.md#mqinputnode-mode-how-your-messages-will-be-processed)
   - [MQOutputNode mode. How your messages will be processed](docs/nodes/mq-nodes.md#mqoutputnode-mode-how-your-messages-will-be-processed)
   - [Scenario full queue MQOutputNode node](docs/nodes/mq-nodes.md#scenario-full-queue-mqoutputnode-node)

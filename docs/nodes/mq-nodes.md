@@ -3,6 +3,7 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [MQEndPoint Policy](#mqendpoint-policy)
+- [Alternative to MQEndPoint Policy](#alternative-to-mqendpoint-policy)
 - [MQInputNode mode. How your messages will be processed](#mqinputnode-mode-how-your-messages-will-be-processed)
 - [MQOutputNode mode. How your messages will be processed](#mqoutputnode-mode-how-your-messages-will-be-processed)
 - [Scenario full queue MQOutputNode node](#scenario-full-queue-mqoutputnode-node)
@@ -15,45 +16,49 @@
 
 # MQEndPoint Policy
 
-Your Integration Server __OR__ Integration Node should associate with a QMGR if your flow
-contains MQ nodes (MQ Input, MQ Output, MQ Get).
-
-In ACE you create an MQEndPoint Policy. From your Application you then reference this policy if the flow within
-the Application contains MQ nodes. You need to deploy the Application __ALONG__ with the MQEndPoint Policy or deploy
-the Policy prior to deploying the Application.
-
-You also need to add the Queue Manager details to the server.conf.yaml or node.conf.yaml in order associate the 
-Integration Server/Node with the Queue Manager.
+In ACE you create an MQEndPoint Policy. If the flow within the Application contains an MQ Input node then add the MQ Policy to it's properties in the Toolkit. The same applies to the MQ Output node. This way the Application can then reference this policy. You need to deploy the Application __ALONG__ with the MQEndPoint Policy or deploy the Policy prior to deploying the Application.
 
 ![MQEndPoint Project contains Policy](../../images/MQEndPointProject_Policy.png)
 
-If you have a message flow that contains an MQEndpoint policy that connects to queue manager
-ACEQM & you deploy it to an independent Integration Server (without a
-queue manager specified in it's server.conf.yaml) you will see the
-message:
+If you forget to update MQ nodes with an MQEndpoint policy and the Integration server server.conf.yaml does not
+have a default queue manager then how will it connect to the queue manager?
+You will see the message:
 
+```
 > BIP1361E Message flow node 'MQ Input',
 > 'com.udemy.ace12_26.MQEndpointTest#FCMComposite_1_1' in Message flow
 > 'com.udemy.ace12_26.MQEndpointTest',
 > 'com.udemy.ace12_26.MQEndpointTest' requires Policy 'Default' of
 > type 'MQEndpoint' which is not deployed.
+```
 
-If you deploy with a QMGR in the server.conf.yaml then deployment
-completes without problems. If you stop the IServer, remove the
-defaultQueueManager from the conf file, then try to start it again you
-will see:
+# Alternative to MQEndPoint Policy
 
+If you opt to not using a policy your Integration Server __OR__ Integration Node should associate with a QMGR if your flow contains MQ nodes (MQ Input, MQ Output, MQ Get).
+
+You need to add the Queue Manager details to the server.conf.yaml or node.conf.yaml in order associate the 
+Integration Server/Node with the Queue Manager.
+
+```
+$ grep defaultQueueManager iServer/server.conf.yaml
+defaultQueueManager: 'QM1'
+```
+
+Then restart iServer.
+
+If you then deploy and see this error again:
+
+```
 > BIP1361E Message flow node 'MQ Input',
 > 'com.udemy.ace12_26.MQEndpointTest#FCMComposite_1_1' in Message flow
 > 'com.udemy.ace12_26.MQEndpointTest',
 > 'com.udemy.ace12_26.MQEndpointTest' requires Policy 'Default' of
-> type 'MQEndpoint' which is not deployed. The identified resource
-> requires a policy which has not been deployed. If this message is
-> reported while the message flow is being deployed then this will not
-> cause the deploy operation to fail however the message flow will be
-> unable to start until the missing policy is deployed. Deploy the
-> missing policy, or update the message flow to remove the dependancy on
-> the policy.
+> type 'MQEndpoint' which is not deployed.
+```
+
+That means your MQ Input or MQ Output nodes properties __still__ reference an MQEndpoint policy. Remove those property values.
+
+If you restart the IServer, the deployment works fine. 
 
 # MQInputNode mode. How your messages will be processed
 
