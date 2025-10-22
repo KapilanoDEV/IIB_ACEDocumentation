@@ -52,34 +52,7 @@ node, a default server.conf.yaml configuration file is created for each
 of the integration servers, and they are stored in the file system in
 subdirectories below the integration node directory. Any properties that
 you set for the integration node, in the node.conf.yaml file, are
-inherited by the integration servers that it owns. If you have a message
-flow that contains an MQEndpoint policy that connects to queue manager
-ACEQM & you deploy it to an independent Integration Server (without a
-queue manager specified in it's server.conf.yaml) you will see the
-message:
-
-> BIP1361E Message flow node 'MQ Input',
-> 'com.udemy.ace12_26.MQEndpointTest#FCMComposite_1_1' in Message flow
-> 'com.udemy.ace12_26.MQEndpointTest',
-> 'com.udemy.ace12_26.MQEndpointTest' requires Policy 'Default' of
-> type 'MQEndpoint' which is not deployed.
-
-If you deploy with a QMGR in the server.conf.yaml then deployment
-completes without problems. If you stop the IServer, remove the
-defaultQueueManager from the conf file, then try to start it again you
-will see:
-
-> BIP1361E Message flow node 'MQ Input',
-> 'com.udemy.ace12_26.MQEndpointTest#FCMComposite_1_1' in Message flow
-> 'com.udemy.ace12_26.MQEndpointTest',
-> 'com.udemy.ace12_26.MQEndpointTest' requires Policy 'Default' of
-> type 'MQEndpoint' which is not deployed. The identified resource
-> requires a policy which has not been deployed. If this message is
-> reported while the message flow is being deployed then this will not
-> cause the deploy operation to fail however the message flow will be
-> unable to start until the missing policy is deployed. Deploy the
-> missing policy, or update the message flow to remove the dependancy on
-> the policy.
+inherited by the integration servers that it owns. 
 
 When you create a managed integration server for an integration node,
 server-specific settings are created for it in its own server.conf.yaml
