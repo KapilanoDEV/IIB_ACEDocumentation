@@ -74,9 +74,10 @@
   - [JCN code to access a message set](docs/java.md#jcn-code-to-access-a-message-set)
 
 - [Routing](docs/routing.md)
-- [Route node](docs/routing.md#route-node)
-- [Filter node](docs/routing.md#filter-node)
-- [RouteToLabel node](docs/routing.md#routetolabel-node)
+  - [Message Routing](docs/routing.md#message-routing)
+  - [Route node](docs/routing.md#route-node)
+  - [Filter node](docs/routing.md#filter-node)
+  - [RouteToLabel node](docs/routing.md#routetolabel-node)
 
 - [Security](docs/security.md)
   - [HTTPS webservice](docs/security.md#https-webservice)
