@@ -279,7 +279,43 @@ END IF;
 | **Used in** | Compute, Filter, Database nodes | Any ESQL routine | Any ESQL routine |
 | **Analogy** | “Send this message now.” | “I’m done — send message once.” | “I’m done — don’t send anything.” |
 
+### Example: PROPAGATE vs RETURN TRUE vs RETURN FALSE
 
+```esql
+CREATE COMPUTE MODULE Demo_Propagate_Return
+  CREATE FUNCTION Main() RETURNS BOOLEAN
+  BEGIN
+    -- Example 1: Use PROPAGATE to send message immediately
+    IF InputRoot.XMLNSC.Order.Type = 'SPLIT' THEN
+      DECLARE I INTEGER 1;
+      WHILE I <= CARDINALITY(InputRoot.XMLNSC.Order.Item[]) DO
+        -- Send each item separately
+        SET OutputRoot.XMLNSC.Item = InputRoot.XMLNSC.Order.Item[I];
+        PROPAGATE;  -- Sends message now
+        SET I = I + 1;
+      END WHILE;
+      RETURN FALSE; -- Stop default propagation (we already sent messages)
+    END IF;
+
+    -- Example 2: RETURN TRUE (default propagation)
+    IF InputRoot.XMLNSC.Order.Type = 'NORMAL' THEN
+      -- Transform message normally
+      SET OutputRoot = InputRoot;
+      RETURN TRUE; -- Ends ESQL and lets the message propagate once
+    END IF;
+
+    -- Example 3: RETURN FALSE (suppress propagation)
+    IF InputRoot.XMLNSC.Order.Type = 'CANCELLED' THEN
+      -- Do not send message downstream
+      CALL LogMessage('Order cancelled - no propagation');
+      RETURN FALSE; -- Ends processing and prevents message propagation
+    END IF;
+
+    -- Default behavior (same as RETURN TRUE)
+    RETURN TRUE;
+  END;
+END MODULE;
+```
 
 Example usage of both:
 ```

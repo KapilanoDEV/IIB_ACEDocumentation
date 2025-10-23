@@ -33,10 +33,30 @@ you develop for use in a Filter node in any other type of node.
 
 # RouteToLabel node
 
-Use the RouteToLabel node after a Compute node or a JavaCompute node
-for complex routing. Define a list of destinations in a Compute or
-JavaCompute node that are acted on by the RouteToLabel node. The
-RouteToLabel node interrogates the destinations and passes the message
-on to the corresponding Label node.
+The RouteToLabel node dynamically routes a message to a Label node in the message flow based on the content of the message's LocalEnvironment tree. It interrogates the LocalEnvironment to find the identifier of the destination Label node. This allows for flexible routing without needing physical connections to all possible Label nodes. 
+
+## How it works
+1. Populate the LocalEnvironment: Before the RouteToLabel node, a Compute or JavaCompute node is used to populate the LocalEnvironment with the identifiers of one or more Label nodes.
+1. Dynamic Routing: When the message reaches the RouteToLabel node, it reads the identifiers from the LocalEnvironment and sends the message to the corresponding Label node.
+1. Logical connection: A physical connection is not needed between the RouteToLabel node and the Label node; the broker makes the connection based on the data in the LocalEnvironment.
+1. Label node's role: The Label node itself does not process the message. It simply acts as a target for the routing decision and is typically followed by a subflow or another sequence of nodes. 
+
+Use the RouteToLabel node after a Compute node or a JavaCompute node for complex routing. Define a list of destinations in a Compute or JavaCompute node that are acted on by the RouteToLabel node. This node's properties have no significance since the LE dictates on the fly flow destination choices.
+In order to understand this you need to understand the LocalEnvironment tree as the RouteToLabel node interrogates the destinations and passes the message on to the corresponding Label node using the LocalEnvironment tree.
+
+>* NOTE
+>* OutputLocalEnvironment is an editable tree. InputRoot is not
+
+>* Reference
+>* [DEC292020-IIB Timeout_LabelRouting_MultiQueues 34 minutes](https://drive.google.com/file/d/1sJ3i-KQYDRGw1UG38bU05uUMFCe6r-Pa/view?usp=share_link)
+>* We can override most node properties with LE tree.
+>* [Udemy Routing using RouteToLabel Node](https://www.udemy.com/course/ibm-integration-bus-with-practicals/learn/lecture/20708678#overview)
+>* Search for Local enviornment tree structure in Infocenter.
+
+## LocalEnvironment tree
+
+It will consist of pre-defined variables and user-defined variables. So, either you can create your own variables or use pre-defined. The scope of the variables is only till the next node. In the flow below the variables are defined using ESL in the xml manipulation node. But the LE tree is only available till the MQ Output node. If there were nodes after the latter then they would not have access to that LE tree. In addition instead of using hard coded values in the MQ Output node's properties we can set the property values as defined in the LE tree.
+
+![Scope LocalEnvronment tree](../images/scopeLocalEnvironment.png)
 
 [← Back to Main page](../IIB_ACE.md)

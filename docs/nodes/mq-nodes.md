@@ -161,14 +161,15 @@ The message has been backed out to the DLQ for the QMGR.
 [DEC292020-IIB Timeout_LabelRouting_MultiQueues](https://drive.google.com/file/d/1sJ3i-KQYDRGw1UG38bU05uUMFCe6r-Pa/view?usp=share_link)
 
 You can send the message to multiple queues in ESQL. You need to change the Compute mode
-to LocalEnvironment and Message in the Compute node properties as well
-as the MQ Output's Destination mode to Destination List. Use the
-command:
+to LocalEnvironment and Message in the Compute node properties as well as the MQ Output's Destination mode to Destination List. Use the command:
 
 ```
 SET OutputLocalEnvironment.Destination.MQ.DestinationData[1].queueName='OUT';
 SET OutputLocalEnvironment.Destination.MQ.DestinationData[2].queueName='OUT1';
 ```
+
+>* Reference
+>* [LocalEnvironment tree](../routing.md#localenvironment-tree)
 
 # MQ Reply
 
@@ -189,6 +190,8 @@ The MQRFH2 header is used to pass messages to and from an integration
 node that belongs to IBM® Integration Bus. In a message, the MQRFH2
 header follows the WebSphere® MQ message descriptor (MQMD) and precedes
 the message body, if present.
+
+![Message with MQRFH2 header](../../images/message_withMQRFH2.png)
 
 What is the use of MQRFH2 header? You can pass application data to
 __other__ flows if the protocol is MQ. In the example below
