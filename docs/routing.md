@@ -23,13 +23,39 @@ the RCD where the domain is set.
 
 # Route node
 
-The Route node does not support ESQL. The Filter, Compute and Database nodes do.
+The Route node does not support ESQL. The Filter, Compute and Database nodes do. The Route node uses XPaths to determine which developer-defined terminal to send the message via. If, for example, you have an XMLNSC payload in the Body, then deploy your app with a schema for that XML. Then the paths will match to the terminal. You can see this in a Filter table in the Basic properties. It's not just XSD. You can use any Message Model. The Distribution mode dictates whether all or just the First match must be met.
+
+![RouteNode](../images/RouteNode.png)
 
 # Filter node
 
 Use the Filter node with an ESQL statement to determine the next node
 to which the message is sent by this node. Do not use the ESQL code that
 you develop for use in a Filter node in any other type of node.
+
+## Compute node vs Filter node
+
+```
+CREATE COMPUTE MODULE LoadGlobalCache_LoadCache
+CREATE FUNCTION Main() RETURNS BOOLEAN
+BEGIN
+
+    IF(InputRoot.XMLNSC...
+
+```
+### Filter node
+```
+CREATE FILTER MODULE FilterNode_Filter
+CREATE FUNCTION Main() RETURNS BOOLEAN
+BEGIN
+
+    IF(Root.XMLNSC...
+
+```
+
+The Filter node does not use InputRoot or OutputRoot. Only Root. It cannot make changes to the tree.
+The 'RETURN TRUE' will go to this node's True terminal. But in Compute it will go to the Out terminal.
+The 'RETURN FALSE' will go to this node's False terminal. But in Compute it will just stop.
 
 # RouteToLabel node
 

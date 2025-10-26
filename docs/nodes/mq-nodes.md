@@ -186,66 +186,72 @@ matches.
 
 # MQRFH2 Tree
 
-The MQRFH2 header is used to pass messages to and from an integration
-node that belongs to IBM® Integration Bus. In a message, the MQRFH2
-header follows the WebSphere® MQ message descriptor (MQMD) and precedes
+>* REFERENCE [MQRFH2 Udemy](https://www.udemy.com/course/ibm-integration-bus-with-practicals/learn/lecture/20708830#overview)
+
+The MQRFH2 header is used to pass messages to and from an integration node that belongs to IBM® Integration Bus. 
+
+It allows downstream systems (or other IIB flows) to understand the message domain and properties.
+
+In a message, the MQRFH2 header follows the WebSphere® MQ message descriptor (MQMD) and precedes
 the message body, if present.
 
 ![Message with MQRFH2 header](../../images/message_withMQRFH2.png)
 
 What is the use of MQRFH2 header? You can pass application data to
-__other__ flows if the protocol is MQ. In the example below
-the MQ Output puts a message to a queue called test2. That then triggers
-another message flow called SecondFlow.msgflow which has an MQ Input to
-receive the message. You cannot use Environment.Variables.orderPerson
-when traversing from FirstFlow.msgflow to SecondFlow.msgflow. So how can
-you pass the data in Environment.Variables.orderPerson?
+__other__ flows if the protocol is MQ. 
 
-In the flow below the environmental variable is not available for the
-"call Service" but is accessible from the compute nodes. The 'call
-Service' contains:
+The Environment Tree is in memory and holds temporary data used within a flow (not transmitted), inside the message flow context whereas MQRFH2 is in the message itself and carries metadata and message properties across systems (in transit).
 
-```
-SET OutputRoot.XMLNSC.ServiceResponse = InputRootXMLNSC.shiporder.shipto;
-```
+In the example below:
 
-In the first flow: 
+![MQRFH2](../../images/MQRFH2.png)
+
+Environment variable scope is in the message flow. The environment variables defined in the first Compute node are available to the Compute1 node. But these environment variables are not available to the Compute in the msglow that the 'call Service' calls (another message flow in the same Application called HTTPService.msgflow). The MQ Output puts a message to a queue called test2. That then triggers another message flow called SecondFlow.msgflow which has an MQ Input to read the message PUT on test2. Again SecondFlow.msgflow cannot access the Environment variables from FirstFlow.msgflow. So how can
+you pass the data from one flow to another? The answer is MQRFH2 header.
 
 ```
-SET Environment.Variables.orderPerson = InputRoot.XMLNSC.shiporder.orderperson;
+CREATE COMPUTE MODULE FirstFlow_Compute
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		 CALL CopyMessageHeaders();
+
+		SET Environment.Variables.orderPerson = InputRoot.XMLNSC.shiporder.orderperson;
 ```
 
-This variable is then needed in the second flow:
+Then in the later Compute1:
 
 ```
-SET OutputRoot.MQRFH2.usr.oPerson = Environment.Variables.orderPerson;
+CREATE COMPUTE MODULE FirstFlow_Compute1
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		 CALL CopyMessageHeaders();
+         DELETE FIELD OutputRoot.HTTPResponseHeader; -- this came from the HTTPService.msgflow and is not needed downstream.
+         SET OutputRoot.XMLNSC.Acknowledgment = 'Sent to Downstream';
+         PROPAGATE TO TERMINAL 'out1'; -- goes to HTTP Reply so the Acknowledgment goes back to the client that sent the HTTP request. This will also delete all the messages in the OutputRoot unless you add DELETE NONE to the PROPAGATE
+
+         SET OutputRoot.Properties = InputRoot.Properties; -- need to construct the tree again after the PROPAGATE deletes the message tree above.
+         SET OutputRoot.MQMD = InputRoot.MQMD;
+
+		SET OutputRoot.MQRFH2.usr.oPerson = Environment.Variables.orderPerson; -- Latter was set in the first Compute. Upto usr is standard syntax. The usr is for storing User-defined application data.
+
+        SET OutputRoot.MQRFH2.usr.shipto = InputRoot.XMLNSC.ServiceResponse; -- ServiceResponse comes from the Compute in the HTTPService.msgflow.
 ```
-
-Since the Compute1 node has an Out1 → HTTP Reply and Out → MQ Output
-you need to construct a message for the tree that will go to HTTP Reply
-& a different message tree that goes to MQ Output.
-
+In the HTTPService.msgflow:
 ```
-CALL CopyMessageHeaders();
-DELETE FIELD OutputRoot.HTPResponseHeader;
-SET OutputRoot.XMLNSC.Acknowledgement = 'Sent to Downstream';
-PROPAGATE TO TERMINAL 'out1'; --this goes to the HTTP Reply which sends a response to the client that initiated the HTTP request
-```
-(FYI if you added DELETE NONE to the last ESQL it will not delete the
-Message Assembly/Logical Tree after propagating)
-
------------- Second message assembly being constructed from scratch again
-
-```
-SET OutputRoot.Properties = InputRoot.Properties;
-SET OutputRoot.MQMD = InputRoot.MQMD;
-DELETE FIELD OutputRoot.HTPResponseHeader;
-SET OutputRoot.MQRFH2.usr.oPerson = Environment.Variables.orderPerson;
-SET OutputRoot.MQRFH2.usr.shipto = InputRoot.XMLNSC.ServiceResponse; -- this is the response from 'call Service'. This Input Assembly was object was constructed in the 'call Service'.
-
-RETURN TRUE; -- by default means it will propagate to the OUT terminal so no need for an explicit propagate. To stop this default behaviour use RETURN FALSE
+SET OutputRoot.XMLNSC.ServiceResponse = InputRoot.XMLNSC.shiporder.shipto;
 ```
 
 Once the 2nd message assembly reaches the 2nd flow via MQ protocol a new Output message assembly is created using the MQRFH2 header values.
+
+```
+CREATE COMPUTE MODULE SecondFlow_Compute
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+    -- DELETE FIELD InputRoot.MQRFH2;
+    IF EXISTS(InputRoot.MQRFH2[]) THEN
+        SET OutputRoot.XMLNSC.FinalResponse.orderPerson = InputRoot.MQRFH2.usr.oPerson;
+        SET OutputRoot.XMLNSC.FinalResponse.ShipTo = InputRoot.MQRFH2.usr.shipto;
+    END IF;
+```
 
 [← Back to Main page](../../IIB_ACE.md)
