@@ -135,7 +135,7 @@ both read from and write to.
 
 # MOVE NEXTSIBLING vs CARDINALITY and [i] call in a WHILE loop
 
-..with subscript code, where in order to find the [n+1]'th entry when
+Look at the code below while reading this. With subscript code, where in order to find the [n+1]'th entry when
 using indices, Broker must navigate to [1], [2], [3],....[n]
 and then to [n+1]. Using subscripts is regarded as a performance no
 no. Imagine you had 10,000 Orders. This would result in each and every
