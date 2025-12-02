@@ -97,7 +97,10 @@
   - [Event Monitoring using node properties](docs/monitoring.md#event-monitoring-using-node-properties)
   - [Event Monitoring using monitoring profile XML file](docs/monitoring.md#event-monitoring-using-monitoring-profile-xml-file)
 
-- [Troubleshooting](docs/troubleshooting.md)  
+- [Troubleshooting](docs/troubleshooting.md)
+  - [Monitoring and Troubleshooting](docs/troubleshooting.md#monitoring-and-troubleshooting)
+  - [Trace Node](#trace-node)
+  - [Validation settings for input type nodes](docs/troubleshooting.md#validation-settings-for-input-type-nodes)  
   - [Validation settings for input type nodes](docs/troubleshooting.md#validation-settings-for-input-type-nodes)
 
 - [Web Services](docs/web-service.md)
