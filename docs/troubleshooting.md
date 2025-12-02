@@ -90,8 +90,6 @@ You use:
 
 ---
 
-If you'd like, I can convert this into a **colour-coded table**, **ACE interview answer**, or **visual diagram**.
-
 
 ## Trace Node
 
