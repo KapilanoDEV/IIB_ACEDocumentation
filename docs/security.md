@@ -32,7 +32,7 @@ personal certificate from the ikeyman dropdown. If we are using the file
 as a truststore (since we are consuming a service) we choose Signer
 certificates.
 
-![Certificate Authority](../../docs/images/ca-diagram-b.png)
+![Certificate Authority](../images/ca-diagram-b.png)
 
 # Set up HTTPS web service
 
