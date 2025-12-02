@@ -99,7 +99,7 @@ This is the default logging mechanism in IIB. In the Trace node there are 3 type
 
 __File__
 
-You enter the <path>/<file>. Then you give the pattern made up of user text and ESQL expressions in curly braces. ${Root} is the entire message tree.
+You enter the path to the file. Then you give the pattern made up of user text and ESQL expressions in curly braces. ${Root} is the entire message tree.
 ```
 Message Tree ${Root}
 -----------------------
