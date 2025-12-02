@@ -81,7 +81,7 @@ In order to understand this you need to understand the LocalEnvironment tree as 
 
 ## LocalEnvironment tree
 
-It will consist of pre-defined variables and user-defined variables. So, either you can create your own variables or use pre-defined. The scope of the variables is only till the next node. In the flow below the variables are defined using ESL in the xml manipulation node. But the LE tree is only available till the MQ Output node. If there were nodes after the latter then they would not have access to that LE tree. In addition instead of using hard coded values in the MQ Output node's properties we can set the property values as defined in the LE tree.
+It will consist of pre-defined variables and user-defined variables. So, either you can create your own variables or use pre-defined. The scope of the variables is only till the next node. In the flow below the variables are defined using ESQL in the xml manipulation node. But the LE tree is only available till the MQ Output node. If there were nodes after the latter then they would not have access to that LE tree. In addition instead of using hard coded values in the MQ Output node's properties we can set the property values as defined in the LE tree.
 
 ![Scope LocalEnvronment tree](../images/scopeLocalEnvironment.png)
 
