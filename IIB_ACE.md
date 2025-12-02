@@ -99,6 +99,14 @@
 
 - [Troubleshooting](docs/troubleshooting.md)
   - [Monitoring and Troubleshooting](docs/troubleshooting.md#monitoring-and-troubleshooting)
+  - [**Overview of Differences**](docs/troubleshooting.md#overview-of-differences)
+  - [**Key Distinctions**](docs/troubleshooting.md#key-distinctions)
+      - [**1. Scope and Focus**](docs/troubleshooting.md#1-scope-and-focus)
+      - [**2. Detail vs Performance**](docs/troubleshooting.md#2-detail-vs-performance)
+      - [**3. Usage**](docs/troubleshooting.md#3-usage)
+      - [**4. Data Destination**](docs/troubleshooting.md#4-data-destination)
+  - [**Summary**](docs/troubleshooting.md#summary)
+  
   - [Trace Node](#trace-node)
   - [Validation settings for input type nodes](docs/troubleshooting.md#validation-settings-for-input-type-nodes)  
   - [Validation settings for input type nodes](docs/troubleshooting.md#validation-settings-for-input-type-nodes)

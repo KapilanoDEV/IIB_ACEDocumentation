@@ -3,6 +3,13 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Monitoring and Troubleshooting](#monitoring-and-troubleshooting)
+- [**Overview of Differences**](#overview-of-differences)
+- [**Key Distinctions**](#key-distinctions)
+    - [**1. Scope and Focus**](#1-scope-and-focus)
+    - [**2. Detail vs Performance**](#2-detail-vs-performance)
+    - [**3. Usage**](#3-usage)
+    - [**4. Data Destination**](#4-data-destination)
+- [**Summary**](#summary)
   - [Trace Node](#trace-node)
 - [Validation settings for input type nodes](#validation-settings-for-input-type-nodes)
 
@@ -10,63 +17,83 @@
 
 # Monitoring and Troubleshooting
 
-In IBM App Connect Enterprise (ACE), Activity Logs, Resource Statistics, Trace, and Business Transaction Monitoring (BTM) are distinct tools used for different aspects of monitoring and troubleshooting, primarily differing in their level of detail and purpose. 
+In IBM App Connect Enterprise (ACE), Activity Logs, Resource Statistics, Trace, and Business Transaction Monitoring (BTM) are distinct tools used for different aspects of monitoring and troubleshooting, primarily differing in their level of detail and purpose. The different monitoring features provide distinct levels and types of information, ranging from high-level overviews to detailed debugging data and business-focused tracking. 
 
-<table>
-  <tr>
-    <th style="background:#dbeafe;">Feature</th>
-    <th style="background:#d1fae5;">Activity Logs</th>
-    <th style="background:#fde68a;">Resource Statistics</th>
-    <th style="background:#fbcfe8;">Trace (User/Service)</th>
-    <th style="background:#c7d2fe;">Business Transaction Monitoring (BTM)</th>
-  </tr>
+Here is your content formatted cleanly in **Markdown**:
 
-  <tr>
-    <td style="background:#f0f9ff;"><strong>Purpose</strong></td>
-    <td>High-level overview of message flow interactions with external resources for initial investigation.</td>
-    <td>Quantitative data on performance and resource usage of integration servers (CPU, memory, sockets, etc.).</td>
-    <td>Detailed, step-by-step recording of internal processing within a message flow for deep debugging.</td>
-    <td>End-to-end tracking of a specific business process across multiple systems and stages.</td>
-  </tr>
+---
 
-  <tr>
-    <td style="background:#f0f9ff;"><strong>Data Type</strong></td>
-    <td>Concise, user-focused log entries about specific events.</td>
-    <td>Numerical metrics and statistics reported at intervals (e.g., every 20 seconds).</td>
-    <td>Very verbose, detailed sequence of events and data manipulations.</td>
-    <td>High-level business events showing transaction state and timing.</td>
-  </tr>
+# **Overview of Differences**
 
-  <tr>
-    <td style="background:#f0f9ff;"><strong>Verbosity</strong></td>
-    <td>Low to medium.</td>
-    <td>N/A (quantitative data).</td>
-    <td>Very high (can impact performance).</td>
-    <td>Medium (focused on business events).</td>
-  </tr>
+| **Feature**                               | **Purpose**                                                                                            | **Data Type**                                                             | **Detail Level**                                     | **Performance Impact**                                    |
+| ----------------------------------------- | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------- | ---------------------------------------------------- | --------------------------------------------------------- |
+| **Activity Logs**                         | High-level overview of interactions with external resources for initial investigation.                 | Concise, tagged log entries (text).                                       | High-level; avoids technical complexity.             | **Low** – enabled by default.                             |
+| **Resource Statistics**                   | Quantitative data on the performance and usage of internal resources (CPU, memory, specific nodes).    | Metrics and performance data (quantitative).                              | System/resource-level metrics.                       | **Moderate** – requires activation.                       |
+| **Trace (User and Service)**              | Detailed debugging and problem determination by following internal code paths.                         | Extensive, human-readable logs of internal execution and message content. | Extremely detailed; captures message data snapshots. | **High** – significant performance impact; use sparingly. |
+| **Event Monitoring**                      | Emits custom events at significant points in a flow for external systems (auditing, monitoring tools). | Configurable events (XML or JSON).                                        | Configurable points within a flow.                   | **Moderate** – depends on config & throughput.            |
+| **Business Transaction Monitoring (BTM)** | Tracks the lifecycle and status of a business transaction across multiple flows.                       | Correlated monitoring events presented as transaction summaries.          | Business-process level; transaction-oriented.        | **Moderate** – uses event monitoring + database.          |
 
-  <tr>
-    <td style="background:#f0f9ff;"><strong>When to Use</strong></td>
-    <td>First point of investigation when something unexpected happens, e.g. a connection issue.</td>
-    <td>Ongoing performance monitoring and bottleneck detection.</td>
-    <td>Deep-dive debugging of application logic or internal errors.</td>
-    <td>Tracking critical business operations and their states across the enterprise.</td>
-  </tr>
+---
 
-  <tr>
-    <td style="background:#f0f9ff;"><strong>Activation</strong></td>
-    <td>Enabled by default; configurable with policies.</td>
-    <td>Must be explicitly enabled (not active by default).</td>
-    <td>Must be explicitly started and stopped (can impact performance).</td>
-    <td>Configured in the message flow using monitoring events and definitions.</td>
-  </tr>
-</table>
+# **Key Distinctions**
 
-In short:
-Activity Logs tell you if your flow talked to a database successfully or failed to connect.
-Resource Statistics tell you how much CPU and memory your integration server is using.
-Trace tells you exactly what line of code or internal step your message flow was executing when a problem occurred.
-BTM tells you the overall progress and status of a complete business operation, like an order processing from start to finish, across all involved systems. 
+### **1. Scope and Focus**
+
+* **Activity Logs** & **Trace** focus on *technical behaviour* of ACE.
+
+  * Activity Logs → operational overview
+  * Trace → deep technical debugging
+* **Resource Statistics** → performance monitoring & bottleneck detection
+* **Event Monitoring** & **BTM** → focused on *data and business processes*
+
+  * Event Monitoring → significant flow events
+  * BTM → end-to-end business transaction lifecycle
+
+---
+
+### **2. Detail vs Performance**
+
+* **Trace** gives maximum detail but has the **highest performance impact** → use only when needed.
+* **Activity Logs** are concise, lightweight, safe for continuous use.
+* **Resource Statistics** give important platform metrics with moderate overhead.
+* **Event Monitoring/BTM** add business visibility with manageable cost.
+
+---
+
+### **3. Usage**
+
+* **Activity Logs** → first step when investigating unexpected behaviour.
+* **Trace** → last resort for complex or unexplained issues.
+* **Resource Statistics** → performance tuning, detecting resource issues.
+* **Event Monitoring** → external audit, logging, dashboards.
+* **BTM** → monitoring full business workflows and SLAs.
+
+---
+
+### **4. Data Destination**
+
+* **Activity Logs** → UI, log files, ELK/Splunk.
+* **Resource Statistics** → UI or stats files.
+* **Trace** → local trace files only.
+* **Event Monitoring** → MQ topics or BTM Recorder.
+* **BTM** → database for correlated transaction views.
+
+---
+
+# **Summary**
+
+You use:
+
+* **Activity Logs** → quick operational overview
+* **Resource Statistics** → performance & tuning
+* **Trace** → deep technical debugging
+* **Event Monitoring** → custom visibility and external processing
+* **BTM** → tracking business outcomes end-to-end
+
+---
+
+If you'd like, I can convert this into a **colour-coded table**, **ACE interview answer**, or **visual diagram**.
+
 
 ## Trace Node
 
