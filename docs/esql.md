@@ -33,7 +33,7 @@
 
 # Local, UDP (AKA External) & shared variables
 
-Local variable scope is within the Compute node. UDP scope is
+Local variable scope is within the Compute node. UDP (User-defined properties) scope is
 throughout the message flow. Shared scope is through the execution group
 AKA the Integration Server even if the message flow completes. When the
 next transaction starts the shared variable is available.
