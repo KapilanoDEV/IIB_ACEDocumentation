@@ -18,6 +18,8 @@ have an Action, Identifier, StartDate etc. [DEC292020-IIB Timeout_LabelRouting_M
 
 # Failure and Catch terminals
 
+![FailureCatch](../images/failureCatch.png)
+
 An Exception will roll back to first node (The exception will always be
 in the last child of the ExceptionList) then it will check if the catch
 exception is handled or not [DEC212020-IIB FixHTTPProdCon_ESQLThrow 36
