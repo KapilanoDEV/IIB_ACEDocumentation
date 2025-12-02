@@ -249,7 +249,7 @@ RETURN FALSE;
 ```
 
 ## RETURN
->* Purpose
+>* Purpose:
 RETURN ends the current ESQL procedure or function.
 It does not send any message by itself — it simply stops execution.
 
