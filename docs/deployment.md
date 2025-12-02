@@ -24,56 +24,36 @@ file, you must select Compile and in-line resources.
 
 # BAR override
 
-[Notes from Udemy Section 12.]
+Notes from Udemy Section 12.
 
 Under Independent resources -> GeneratedBarFiles you can copy the bar
 file to a folder or run mqsireadbar
 (04JAN2021-IIBFileNodeBARMQReplyTryCatchFlowOrder 20 minutes).
 
-[ ]
-
 After extracting the file you can copy lines from the
 META-INF/broker.xml and create different property files for different
 environments.
 
-[ ]
+The line from the broker.xml below:
 
-[The line from the broker.xml below:]
+<ConfigurableProperty override="HELLO" uri="ExternalVariable#EXTVAR"/>
 
-[ ]
+Can be copied to a new file called DEV.properties]
 
-\<ConfigurableProperty override="HELLO"
-uri="ExternalVariable#EXTVAR"/>
+ExternalVariable#EXTVAR = diffvalue
 
-[ ]
-
-[Can be copied to a new file called DEV.properties]
-
-[ ]
-
-[ExternalVariable#EXTVAR = diffvalue]
-
-[ ]
-
-Then you can run mqsiapplybaroverride -b \<path to
+Then you can run mqsiapplybaroverride -b <path to
 desktop>/MAP_PRO.generated.bar -p DEV.properties -k MAP_PRO
 
-[ ]
-
-Then go to \<path to desktop>/MAP_PRO.generated.bar, copy it, go to
+Then go to <path to desktop>/MAP_PRO.generated.bar, copy it, go to
 the Toolkit, right click on the MAP_PRO application then, paste it. This
 results in a new BAR folder under the application that contains the new
 generated BAR file. Click on the new BAR and you will see the new
 properties in the RHS.
 
-[ ]
-
 You can then run this command to deploy the BAR with the new
 properties.
 
-[ ]
-
-$> mqsideploy BROKERNAME -e EG_NAME -a \<path to
-desktop>/MAP_PRO.generated.bar
+$> mqsideploy BROKERNAME -e EG_NAME -a \<path to desktop>/MAP_PRO.generated.bar
 
 [← Back to Main page](../IIB_ACE.md)
