@@ -87,7 +87,7 @@
   - [Compile BAR inline](docs/deployment.md#compile-bar-inline)
   - [BAR override](docs/deployment.md#bar-override)
 
-- [Error Handling](docs/error-handling.md)
+- [Error Handling in the message flow](docs/error-handling.md)
   - [Timeout Notification is controlled by Timeout Control](docs/error-handling.md#timeout-notification-is-controlled-by-timeout-control)
   - [Failure and Catch terminals](docs/error-handling.md#failure-and-catch-terminals)
   -   [MQ Failure and Catch](docs/error-handling.md#mq-failure-and-catch)
