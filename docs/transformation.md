@@ -44,7 +44,7 @@ WTX protocol support is less.
 
 Use the XSLTransform node to transform an XML message to another form
 of message, according to the rules provided by an XSL (Extensible
-Stylesheet Language) style sheet, and to set the Message domain, Message
+Stylesheet Language) style sheet, and to set the Message domain (<xsl:output method="xml"), Message
 model, Message, and Physical format for the generated message.
 
 Here is a sample XSL file. You can drag and drop the file onto the
