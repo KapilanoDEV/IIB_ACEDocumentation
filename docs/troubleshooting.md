@@ -19,8 +19,6 @@
 
 In IBM App Connect Enterprise (ACE), Activity Logs, Resource Statistics, Trace, and Business Transaction Monitoring (BTM) are distinct tools used for different aspects of monitoring and troubleshooting, primarily differing in their level of detail and purpose. The different monitoring features provide distinct levels and types of information, ranging from high-level overviews to detailed debugging data and business-focused tracking. 
 
-Here is your content formatted cleanly in **Markdown**:
-
 ---
 
 # **Overview of Differences**
