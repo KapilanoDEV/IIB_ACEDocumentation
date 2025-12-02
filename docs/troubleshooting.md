@@ -62,6 +62,11 @@ In IBM App Connect Enterprise (ACE), Activity Logs, Resource Statistics, Trace, 
   </tr>
 </table>
 
+In short:
+Activity Logs tell you if your flow talked to a database successfully or failed to connect.
+Resource Statistics tell you how much CPU and memory your integration server is using.
+Trace tells you exactly what line of code or internal step your message flow was executing when a problem occurred.
+BTM tells you the overall progress and status of a complete business operation, like an order processing from start to finish, across all involved systems. 
 
 ## Trace Node
 
