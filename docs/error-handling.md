@@ -11,8 +11,7 @@
 
 # Timeout Notification is controlled by Timeout Control
 
-, so long as they both have the same unique identifier. You also need
-to set the operation mode of the Timeout Notification to Controlled, not
+In the same way that cron jobs operate to a set interval. IIB does this with the Timeout Notification and Timeout Control nodes. You have a Timeout Notification connected to say an MQ Output node and set it's interval property to 20 seconds. Once this flow is deployed it triggers every 20 seconds. You can have a Timeout Notification on it's own but you cannot have a Timeout Control without a Timeout Notification. Timeout Notification is controlled by Timeout Control so long as they both have the same unique identifier. You also need to set the operation mode of the Timeout Notification to Controlled, not
 Automatic. The Timeout Control node has a Request location property
 InputRoot.XMLNSC.EmpDetails.TimeoutRequest. Within the Timeout you will
 have an Action, Identifier, StartDate etc. [DEC292020-IIB Timeout_LabelRouting_MultiQueues](https://drive.google.com/file/d/1sJ3i-KQYDRGw1UG38bU05uUMFCe6r-Pa/view?usp=share_link)
