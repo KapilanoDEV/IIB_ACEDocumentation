@@ -28,7 +28,7 @@ the node at the end of the catch terminal. The ExceptionList will
 contain the exception that will give you a better idea of what & where
 in the flow the problem happened. If there is an exception raised while
 processing downflow of the Catch then the exception will feedback then
-traverse the Failure node path only if Transaction Mode is Yes.{.s2}\
+traverse the Failure node path only if Transaction Mode is Yes.
 If catch is not connected it will check if Failure is connected.
 Then the default exception and NOT the exception we threw go to the node
 at the end of the Failure terminal only if Transaction Mode is Yes. The
